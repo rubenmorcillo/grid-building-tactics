@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52e3eec01c227a24a91a71a5db6123e2, type: 3}
+  m_Name: AlmacenMadera
+  m_EditorClassIdentifier: 
+  nameString: Almacen madera
+  prefab: {fileID: 4811315222674391532, guid: 9188295e82fc99b42a5c855500c5f361, type: 3}
+  visual: {fileID: 4811315222674391532, guid: 9188295e82fc99b42a5c855500c5f361, type: 3}
+  width: 2
+  height: 2
+  woodCost: 50
+  metalCost: 150
+  desc: Aumenta la capacidad de madera que puedes almacenar
