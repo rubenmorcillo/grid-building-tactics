@@ -5,7 +5,7 @@ using UnityEngine;
 public class MovingUnitTest : MonoBehaviour
 {
 
-    private const float speed = 40f;
+    private const float speed = 10f;
 
     private int currentPathIndex;
     private List<Vector3> pathVectorList;
@@ -38,6 +38,8 @@ public class MovingUnitTest : MonoBehaviour
             targetPosition.y -= Pathfinding.Instance.GetGrid().GetCellSize() / 2;
             if (Vector3.Distance(transform.position, targetPosition) > 1f)
 			{
+                Debug.Log(pathVectorList.Count);
+
                 Vector3 moveDir = (targetPosition - transform.position).normalized;
 
                 float distanceBefore = Vector3.Distance(transform.position, targetPosition);
@@ -64,10 +66,10 @@ public class MovingUnitTest : MonoBehaviour
         currentPathIndex = 0;
         pathVectorList = Pathfinding.Instance.FindPath(GetPosition(), targetPosition);
 
-        if (pathVectorList != null && pathVectorList.Count > 1)
+		if (pathVectorList != null && pathVectorList.Count > 1)
 		{
-            pathVectorList.RemoveAt(0);
+			pathVectorList.RemoveAt(0);
 
-        }
+		}
 	}
 }

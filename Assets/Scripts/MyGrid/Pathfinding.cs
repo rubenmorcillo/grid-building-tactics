@@ -369,7 +369,6 @@ public class Pathfinding
 
 		while(process.Count > 0)
 		{
-			Debug.Log("jkldsadlkas");
 			PathNode node = process.Dequeue();
 			selectableNodes.Add(node);
 			node.selectable = true;

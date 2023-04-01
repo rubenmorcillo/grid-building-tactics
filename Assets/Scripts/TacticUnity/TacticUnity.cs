@@ -14,8 +14,13 @@ public class TacticUnity : MonoBehaviour
 
     void Update()
     {
-        
+        if (combatData.movementDone && combatData.actionDone)
+		{
+            CombateManager.instance.EndTurn();
+		}
     }
+
+    
 
     public void BeginTurn()
     {
