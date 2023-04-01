@@ -13,7 +13,10 @@ public class PathNode
 	public int hCost;
 	public int fCost;
 
-	public bool walkable;
+	public bool isWalkable;
+	public bool current = false;
+	public bool selectable = false;
+
 
 	public PathNode cameFromNode;
 
@@ -27,7 +30,7 @@ public class PathNode
 		this.x = x;
 		this.z = z;
 
-		walkable = true;
+		isWalkable = true;
 
 		// Pre-calculate neighbours
 		//Neighbours = new PathNode[8];
@@ -41,6 +44,11 @@ public class PathNode
 		//	}
 		//
 		//
+	}
+
+	public void SetIsWalkable(bool isWalkable)
+	{
+		this.isWalkable = isWalkable; 
 	}
 	
 	public void CalculateFcost()

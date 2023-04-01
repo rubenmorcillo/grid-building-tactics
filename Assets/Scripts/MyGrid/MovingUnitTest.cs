@@ -16,7 +16,7 @@ public class MovingUnitTest : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         HandleMovement();
     }
@@ -35,14 +35,13 @@ public class MovingUnitTest : MonoBehaviour
         if (pathVectorList != null)
 		{
             Vector3 targetPosition = pathVectorList[currentPathIndex];
-            targetPosition.y = targetPosition.y - Pathfinding.Instance.GetGrid().GetCellSize() / 2;
+            targetPosition.y -= Pathfinding.Instance.GetGrid().GetCellSize() / 2;
             if (Vector3.Distance(transform.position, targetPosition) > 1f)
 			{
                 Vector3 moveDir = (targetPosition - transform.position).normalized;
 
                 float distanceBefore = Vector3.Distance(transform.position, targetPosition);
                 //animatedWalker.SetMoveVector(moveDir);
-                if (Input.GetKeyDown(KeyCode.Space))
                 transform.position = transform.position + moveDir * speed * Time.deltaTime;
 			}
 			else

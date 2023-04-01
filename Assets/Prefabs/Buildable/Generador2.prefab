@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2198476450027246079}
   - component: {fileID: 2750194191508257217}
   - component: {fileID: 4813267831682119768}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7076288591780390071}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Anchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: -7423373311759371265}
   - component: {fileID: 6033458961230535382}
   - component: {fileID: -4377673354341895473}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Generador2
   m_TagString: Interactuable
   m_Icon: {fileID: 0}
@@ -283,6 +283,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Emergency_Backup_Generator-(FBX 7.4 binary mit Animation) (2)
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 95e48edb5f089b341882bfd2a2828d65,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 95e48edb5f089b341882bfd2a2828d65, type: 3}
 --- !u!4 &1143483731615270538 stripped
@@ -372,6 +377,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Emergency_Backup_Generator-(FBX 7.4 binary mit Animation) (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 95e48edb5f089b341882bfd2a2828d65,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 95e48edb5f089b341882bfd2a2828d65, type: 3}

@@ -6,8 +6,10 @@ public class Pathfinding
 {
 
 	private const int MOVE_STRAIGHT_COST = 10;
-	private const int MOVE_DIAGONAL_COST = 12;
+	private const int MOVE_DIAGONAL_COST = 14;
 	private GridXZ<PathNode> grid;
+
+	private List<PathNode> selectableNodes = new List<PathNode>();
 	private List<PathNode> openList;
 	private List<PathNode> closedList;
 
@@ -16,12 +18,41 @@ public class Pathfinding
 	{
 		Instance = this;
 		grid = new GridXZ<PathNode>(width, height, cellSize, Vector3.zero, (GridXZ<PathNode> g, int x, int y) => new PathNode(g,x,y));
+		UpdateObstacles(grid);
+
+	}
+
+	public void UpdateObstacles(GridXZ<PathNode> grid)
+	{
+		float cellSize = grid.GetCellSize();
+		for (int x = 0; x < grid.GetWidth(); x++)
+		{
+			for (int y = 0; y < grid.GetHeight(); y++)
+			{
+				PathNode nodoLocalizado = GetNode(x, y);
+				Vector3 worldPosition = grid.GetWorldPosition(nodoLocalizado.x, nodoLocalizado.z);
+				Vector3 centroNodo = new Vector3(worldPosition.x + cellSize / 2, 0, worldPosition.z + cellSize / 2);
+				Collider[] hits = Physics.OverlapBox(centroNodo, new Vector3(cellSize / 2.5f, cellSize / 2.5f, cellSize / 2.5f), Quaternion.identity, LayerMask.GetMask("Obstacles"));
+				if (hits?.Length > 0)
+				{
+					nodoLocalizado.SetIsWalkable(false);
+
+					//foreach (Collider c in hits)
+					//{
+					//	nodoLocalizado.SetIsWalkable(false);
+					//	Debug.Log("Soy la casilla " + nodoLocalizado.ToString() + " isWalkable: " + nodoLocalizado.isWalkable + " mi posición real en el mundo es " + grid.GetWorldPosition(nodoLocalizado.x, nodoLocalizado.z) + "he golpeado con " + c.transform.gameObject.name);
+					//}
+				}
+
+			}
+		}
 	}
 
 	public GridXZ<PathNode> GetGrid()
 	{
 		return grid;
 	}
+
 
 	public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 endWorldPosition)
 	{
@@ -81,7 +112,7 @@ public class Pathfinding
 			foreach(PathNode neighbourNode in GetNeighbourList(currentNode))
 			{
 				if (closedList.Contains(neighbourNode)) continue;
-				if (!neighbourNode.walkable)
+				if (!neighbourNode.isWalkable)
 				{
 					closedList.Add(neighbourNode);
 					continue;
@@ -92,7 +123,7 @@ public class Pathfinding
 				{
 					neighbourNode.cameFromNode = currentNode;
 					neighbourNode.gCost = tentativeGCost;
-					neighbourNode.gCost = CalculateDistanceCost(neighbourNode, endNode);
+					neighbourNode.hCost = CalculateDistanceCost(neighbourNode, endNode);
 					neighbourNode.CalculateFcost();
 
 					if (!openList.Contains(neighbourNode))
@@ -196,5 +227,20 @@ public class Pathfinding
 			}
 		}
 		return lowerFCostNode;
+	}
+
+	public void GetCurrentNode()
+	{
+		TacticUnity currentUnity = CombateManager.instance.currentUnity;
+		PathNode current = GetNode(Mathf.RoundToInt(currentUnity.transform.position.x / grid.GetCellSize()), Mathf.RoundToInt(currentUnity.transform.position.z / grid.GetCellSize()));
+		Debug.Log("El jugador actual es " + currentUnity.name + " y está en la casilla " + current.ToString());
+	}
+
+	public void FindSelectableNodes()
+	{
+		selectableNodes.Clear();
+		//esto a lo mejor solo es para el player principal, ya veremos
+		Queue<PathNode> process = new Queue<PathNode>();
+		GetCurrentNode();
 	}
 }

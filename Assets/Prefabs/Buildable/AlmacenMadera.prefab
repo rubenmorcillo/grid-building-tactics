@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5771763609884204486}
   - component: {fileID: -5465772573669210584}
   - component: {fileID: -5970988951207326161}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: AlmacenMadera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -84,7 +84,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 790557956733923415}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 7429731232613278426}
   - component: {fileID: 271852559290899144}
   - component: {fileID: 7050419020725841069}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -223,6 +223,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Palettes_1C2 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.64
@@ -285,6 +289,10 @@ PrefabInstance:
     - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_Name
       value: Palettes_1C2 (10)
+      objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
@@ -353,6 +361,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Palettes_1C2
       objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.47
@@ -415,6 +427,10 @@ PrefabInstance:
     - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_Name
       value: Palettes_1C2 (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
@@ -482,6 +498,10 @@ PrefabInstance:
     - target: {fileID: 146772, guid: 82a60848665e59d4e9f3595f61150fc9, type: 3}
       propertyPath: m_Name
       value: Shelves_1A
+      objectReference: {fileID: 0}
+    - target: {fileID: 146772, guid: 82a60848665e59d4e9f3595f61150fc9, type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 482906, guid: 82a60848665e59d4e9f3595f61150fc9, type: 3}
       propertyPath: m_LocalPosition.x
@@ -558,6 +578,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Palettes_1C2 (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.46
@@ -625,6 +649,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Palettes_1C2 (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.46
@@ -687,6 +715,10 @@ PrefabInstance:
     - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_Name
       value: Palettes_1C2 (12)
+      objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
@@ -755,6 +787,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Palettes_1C2 (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.46
@@ -817,6 +853,10 @@ PrefabInstance:
     - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_Name
       value: Palettes_1C2 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
@@ -881,6 +921,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Palettes_1C2 (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.25
@@ -943,6 +987,10 @@ PrefabInstance:
     - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_Name
       value: Palettes_1C2 (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1011,6 +1059,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Palettes_1C2 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.63
@@ -1073,6 +1125,10 @@ PrefabInstance:
     - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_Name
       value: Palettes_1C2 (9)
+      objectReference: {fileID: 0}
+    - target: {fileID: 164640, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 485186, guid: df1625a5d3c6e9f49877ea52a2ec4dad, type: 3}
       propertyPath: m_LocalPosition.x
