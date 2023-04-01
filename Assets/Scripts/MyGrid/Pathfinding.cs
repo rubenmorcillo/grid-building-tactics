@@ -242,5 +242,7 @@ public class Pathfinding
 		//esto a lo mejor solo es para el player principal, ya veremos
 		Queue<PathNode> process = new Queue<PathNode>();
 		GetCurrentNode();
+
+
 	}
 }

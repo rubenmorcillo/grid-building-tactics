@@ -515,8 +515,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentUnity: {fileID: 401273285}
-  gridWidth: 7
-  gridHeight: 7
+  gridWidth: 12
+  gridHeight: 12
   cellSize: 5
   tileModel: {fileID: 0}
   movingUnitTest: {fileID: 401273284}
