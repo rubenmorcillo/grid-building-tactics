@@ -58,7 +58,7 @@ public class Pathfinding
 
 			Vector3 worldPosition = grid.GetWorldPosition(x, z);
 			Vector3 centroNodo = new Vector3(worldPosition.x + cellSize / 2, 0, worldPosition.z + cellSize / 2);
-			Debug.Log("Soy la casilla " + pathNode.ToStringFull() +"mi posición real en el mundo es " + grid.GetWorldPosition(pathNode.x, pathNode.z));
+			//Debug.Log("Soy la casilla " + pathNode.ToStringFull() +"mi posición real en el mundo es " + grid.GetWorldPosition(pathNode.x, pathNode.z));
 
 			Collider[] hits = Physics.OverlapBox(centroNodo, new Vector3(cellSize / 2.5f, cellSize / 2.5f, cellSize / 2.5f), Quaternion.identity, LayerMask.GetMask("Obstacles"));
 
@@ -163,88 +163,140 @@ public class Pathfinding
 		return null;
 	}
 
-	private List<PathNode> GetNeighbourList(PathNode currentNode)
+	private List<PathNode> GetNeighbourList(PathNode node)
 	{
 		List<PathNode> neighbourList = new List<PathNode>();
 		PathNode posibleVecino;
-		if (currentNode.x  - 1 >= 0)
+		if (node.x  - 1 >= 0)
 		{
 			//izquierda
-			posibleVecino = GetNode(currentNode.x - 1, currentNode.z);
-			if (posibleVecino.isWalkable)
+			if (!CheckWall(node, -Vector3.right))
 			{
-				neighbourList.Add(posibleVecino);
+				posibleVecino = GetNode(node.x - 1, node.z);
+				if (posibleVecino.isWalkable)
+				{
+					neighbourList.Add(posibleVecino);
+				}
 			}
+
 
 			//izquierda abajo
-			posibleVecino = GetNode(currentNode.x - 1, currentNode.z - 1);
-			if (currentNode.z - 1 >= 0)
+			if (!CheckWall(node, -Vector3.right + Vector3.back))
 			{
-				if (posibleVecino.isWalkable)
+				posibleVecino = GetNode(node.x - 1, node.z - 1);
+				if (node.z - 1 >= 0)
 				{
-					neighbourList.Add(posibleVecino);
+					if (posibleVecino.isWalkable)
+					{
+						neighbourList.Add(posibleVecino);
+					}
 				}
-			}
-			//izquierda arriba
-			posibleVecino = GetNode(currentNode.x - 1, currentNode.z + 1);
-			if (currentNode.z + 1 < grid.GetHeight())
-			{
-				if (posibleVecino.isWalkable)
-				{
-					neighbourList.Add(posibleVecino);
-				}
-			}
-		}
-		if (currentNode.x + 1 < grid.GetWidth())
-		{
-			//Derecha
-			posibleVecino = GetNode(currentNode.x + 1, currentNode.z);
-			if (posibleVecino.isWalkable)
-			{
-				neighbourList.Add(posibleVecino);
-			}
-			//derecha abajo
-			posibleVecino = GetNode(currentNode.x + 1, currentNode.z - 1);
-			if (currentNode.z - 1 >= 0)
-			{
-				if (posibleVecino.isWalkable)
-				{
-					neighbourList.Add(posibleVecino);
-				}
-			}
-			//derecha arriba
-			posibleVecino = GetNode(currentNode.x + 1, currentNode.z + 1);
-			if (currentNode.z + 1 < grid.GetHeight())
-			{
-				if (posibleVecino.isWalkable)
-				{
-					neighbourList.Add(posibleVecino);
-				}
-			}
-		}
-		//abajo
-		posibleVecino = GetNode(currentNode.x, currentNode.z - 1);
-		if (currentNode.z - 1 >= 0)
-		{
-			if (posibleVecino.isWalkable)
-			{
-				neighbourList.Add(posibleVecino);
 			}
 
-		}
-		//arriba
-		posibleVecino = GetNode(currentNode.x, currentNode.z + 1);
-		if (currentNode.z + 1 < grid.GetHeight())
-		{
-			if (posibleVecino.isWalkable)
+			//izquierda arriba
+			if (!CheckWall(node, -Vector3.right + -Vector3.back))
 			{
-				neighbourList.Add(posibleVecino);
+				posibleVecino = GetNode(node.x - 1, node.z + 1);
+				if (node.z + 1 < grid.GetHeight())
+				{
+					if (posibleVecino.isWalkable)
+					{
+						neighbourList.Add(posibleVecino);
+					}
+				}
 			}
+			
+		}
+		if (node.x + 1 < grid.GetWidth())
+		{
+			//Derecha
+			if (!CheckWall(node, Vector3.right))
+			{
+				posibleVecino = GetNode(node.x + 1, node.z);
+				if (posibleVecino.isWalkable)
+				{
+					neighbourList.Add(posibleVecino);
+				}
+			}
+
+			//derecha abajo
+			if (!CheckWall(node, Vector3.right + -Vector3.back))
+			{
+				posibleVecino = GetNode(node.x + 1, node.z - 1);
+				if (node.z - 1 >= 0)
+				{
+					if (posibleVecino.isWalkable)
+					{
+						neighbourList.Add(posibleVecino);
+					}
+				}
+			}
+
+			//derecha arriba
+			if (!CheckWall(node, Vector3.right + Vector3.back))
+			{
+				posibleVecino = GetNode(node.x + 1, node.z + 1);
+				if (node.z + 1 < grid.GetHeight())
+				{
+					if (posibleVecino.isWalkable)
+					{
+						neighbourList.Add(posibleVecino);
+					}
+				}
+			}
+			
+		}
+		//abajo
+		if (!CheckWall(node, Vector3.back))
+		{
+			posibleVecino = GetNode(node.x, node.z - 1);
+			if (node.z - 1 >= 0)
+			{
+				if (posibleVecino.isWalkable)
+				{
+					neighbourList.Add(posibleVecino);
+				}
+
+			}
+		}
+
+
+		//arriba
+		if (!CheckWall(node, -Vector3.back))
+		{
+			posibleVecino = GetNode(node.x, node.z + 1);
+			if (node.z + 1 < grid.GetHeight())
+			{
+				if (posibleVecino.isWalkable)
+				{
+					neighbourList.Add(posibleVecino);
+				}
+			}
+
 		}
 
 		return neighbourList;
 	}
 
+	bool CheckWall(PathNode originNode, Vector3 direction)
+	{
+		bool wall = false;
+		RaycastHit hiteo;
+		Vector3 correccionAltura = new Vector3(0, 0.25f, 0);
+		Vector3 center = new Vector3(originNode.worldX + grid.GetCellSize() / 2, 0, originNode.worldZ + grid.GetCellSize() / 2);
+		if (Physics.Raycast(center + correccionAltura, direction, out hiteo, grid.GetCellSize(), LayerMask.GetMask("Wall")))
+		{
+			//Debug.Log("soy " + originNode.ToString() + " y me estoy chocando con " + hiteo.transform.gameObject.name); ;
+			//if (hiteo.collider.CompareTag("Muro"))
+			//{
+				wall = true;
+				//CheckRelativeCoverages(hiteo.collider.gameObject);
+			//}
+
+		}
+
+		return wall;
+	}
 	private PathNode GetNode(int x, int z)
 	{
 		return grid.GetGridObject(x, z);
@@ -291,12 +343,24 @@ public class Pathfinding
 		return GetNode(Mathf.FloorToInt(currentUnity.transform.position.x / grid.GetCellSize()), Mathf.FloorToInt(currentUnity.transform.position.z / grid.GetCellSize()));
 		 
 	}
+	void ClearSelectableNodes()
+	{
+		if (selectableNodes.Count > 0)
+		{
+			foreach(PathNode node in selectableNodes)
+			{
+				node.Reset();
+			}
+		}
+		selectableNodes.Clear();
+	}
 
 	public void FindSelectableNodes()
 	{
-		selectableNodes.Clear();
+		ClearSelectableNodes();
 		//esto a lo mejor solo es para el player principal, ya veremos
 		PathNode currentNode = GetCurrentNode();
+		//Debug.Log("La casilla actual es: " + currentNode.ToString());
 		
 		Queue<PathNode> process = new Queue<PathNode>();
 
@@ -305,7 +369,7 @@ public class Pathfinding
 
 		while(process.Count > 0)
 		{
-			Debug.Log("jamaica");
+			Debug.Log("jkldsadlkas");
 			PathNode node = process.Dequeue();
 			selectableNodes.Add(node);
 			node.selectable = true;
@@ -314,7 +378,6 @@ public class Pathfinding
 			{
 				foreach(PathNode casilla in GetNeighbourList(node))
 				{
-					Debug.Log(" soy el vecino " + casilla);
 					if (!casilla.visited)
 					{
 						casilla.cameFromNode = node;

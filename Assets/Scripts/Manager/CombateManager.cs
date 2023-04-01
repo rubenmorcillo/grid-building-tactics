@@ -53,10 +53,8 @@ public class CombateManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            pathfinding.FindSelectableNodes();
-        }
+      
+        pathfinding.FindSelectableNodes();
         pathfinding.DebugDrawSelectables();
 
 
@@ -68,7 +66,11 @@ public class CombateManager : MonoBehaviour
         {
             //Vector3 mouseWorldPosition = UtilsClass.GetMouseWorldPositionWithZ();
             pathfinding.GetGrid().GetXZ(Mouse3D.GetMouseWorldPosition(), out int x, out int z);
-            List<PathNode> path = pathfinding.FindPath(0, 0, x, z);
+            if (pathfinding.GetGrid().GetGridObject(x, z).selectable)
+			{
+                List<PathNode> path = pathfinding.FindPath(0, 0, x, z);
+                movingUnitTest.SetTargetPosition(Mouse3D.GetMouseWorldPosition());
+            }
             //DEBUG DRAWLINE
             //         if ( path != null)
             //{
@@ -76,7 +78,6 @@ public class CombateManager : MonoBehaviour
             //                 Debug.DrawLine(new Vector3(path[i].x + 0.5f, 0.5f, path[i].z +0.5f) * grid.GetCellSize() , new Vector3(path[i + 1].x +0.5f, 0.5f, path[i + 1].z + 0.5f) * grid.GetCellSize(), Color.green); 
             //	}
             //}
-            movingUnitTest.SetTargetPosition(Mouse3D.GetMouseWorldPosition());
         }
 
     }

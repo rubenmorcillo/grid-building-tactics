@@ -64,7 +64,7 @@ public class PathNode
 	}
 
 
-	void Reset()
+	public void Reset()
 	{
 		//coveragesDirections.Clear();
 		//coveragesValidDirections.Clear();
