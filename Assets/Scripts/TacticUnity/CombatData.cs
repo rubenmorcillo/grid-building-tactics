@@ -6,14 +6,31 @@ using System;
 [Serializable]
 public class CombatData
 {
-	public int maxMovementPoints;
-	public int currentMovementPoints;
-	public bool accionRealizada;
+	public int movementRange;
+	public int jumpHeight;
+
+	public bool movementDone;
+	public bool actionDone;
+	public bool isAlive;
+
+	//stats
+	public int initiative;
 
 	public CombatData()
 	{
-		if (maxMovementPoints <= 0) maxMovementPoints = 5;
-		currentMovementPoints = maxMovementPoints;
-		accionRealizada = false;
+		if (movementRange <= 0) movementRange = 5;
+		if (jumpHeight <= 0) jumpHeight = 1;
+		if (initiative <= 0) initiative = 3;
+
+
+		movementDone = false;
+		actionDone = false;
+		isAlive = true;
+	}
+
+	public void RestorePoints()
+	{
+		movementDone = false;
+		actionDone = false;
 	}
 }

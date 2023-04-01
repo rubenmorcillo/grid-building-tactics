@@ -13,7 +13,8 @@ public class CombateManager : MonoBehaviour
             return _instance;
         }
     }
-    public TacticUnity currentUnity;
+
+
 
     [SerializeField] private int gridWidth;
     [SerializeField] private int gridHeight;
@@ -26,25 +27,50 @@ public class CombateManager : MonoBehaviour
     private GridXZ<GridBuildingSystem3D.GridObject> grid;
 
     private Pathfinding pathfinding;
-    
+
+    [SerializeField] TacticUnity currentUnity;
+    [SerializeField] TurnManager turnManager;
+
+
     void Start()
     {
+        _instance = this;
         if (crearTilesMapa)
         {
             grid = new GridXZ<GridBuildingSystem3D.GridObject>(gridWidth, gridHeight, cellSize, new Vector3(0, 0, 0), (GridXZ<GridBuildingSystem3D.GridObject> g, int x, int y) => new GridBuildingSystem3D.GridObject(g, x, y, showDebug));
             CrearTilesMapa();
         }
         pathfinding = new Pathfinding(gridWidth, gridHeight, cellSize);
+        if (turnManager == null)
+        {
+            turnManager = new TurnManager();
+        }
+
+        //CHAPUZAAA temporal: TODO -> se deben recuperar todas las unidades al inicio del combate
+        turnManager.AddUnit(currentUnity);
     }
 
 
     void Update()
     {
+      
+        pathfinding.FindSelectableNodes();
+        pathfinding.DebugDrawSelectables();
+
+
+        turnManager?.Update();
+
+		
+
         if (Input.GetMouseButton(0))
         {
             //Vector3 mouseWorldPosition = UtilsClass.GetMouseWorldPositionWithZ();
             pathfinding.GetGrid().GetXZ(Mouse3D.GetMouseWorldPosition(), out int x, out int z);
-            List<PathNode> path = pathfinding.FindPath(0, 0, x, z);
+            if (pathfinding.GetGrid().GetGridObject(x, z).selectable)
+			{
+                List<PathNode> path = pathfinding.FindPath(0, 0, x, z);
+                movingUnitTest.SetTargetPosition(Mouse3D.GetMouseWorldPosition());
+            }
             //DEBUG DRAWLINE
             //         if ( path != null)
             //{
@@ -52,10 +78,19 @@ public class CombateManager : MonoBehaviour
             //                 Debug.DrawLine(new Vector3(path[i].x + 0.5f, 0.5f, path[i].z +0.5f) * grid.GetCellSize() , new Vector3(path[i + 1].x +0.5f, 0.5f, path[i + 1].z + 0.5f) * grid.GetCellSize(), Color.green); 
             //	}
             //}
-            movingUnitTest.SetTargetPosition(Mouse3D.GetMouseWorldPosition());
         }
 
     }
+    public void SetCurrentUnity(TacticUnity currentUnity)
+	{
+        this.currentUnity = currentUnity;
+        pathfinding.FindSelectableNodes();
+	}
+    public TacticUnity GetCurrentUnity()
+	{
+        return currentUnity;
+	}
+    
     void CrearTilesMapa()
     {
         for (int x = 0; x < gridWidth; x++)

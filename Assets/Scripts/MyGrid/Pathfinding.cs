@@ -8,6 +8,7 @@ public class Pathfinding
 	private const int MOVE_STRAIGHT_COST = 10;
 	private const int MOVE_DIAGONAL_COST = 14;
 	private GridXZ<PathNode> grid;
+	private List<PathNode> pathNodeList = new List<PathNode>();
 
 	private List<PathNode> selectableNodes = new List<PathNode>();
 	private List<PathNode> openList;
@@ -18,35 +19,58 @@ public class Pathfinding
 	{
 		Instance = this;
 		grid = new GridXZ<PathNode>(width, height, cellSize, Vector3.zero, (GridXZ<PathNode> g, int x, int y) => new PathNode(g,x,y));
+		StartPathNodeList();
 		UpdateObstacles(grid);
+		
+	}
 
+	void StartPathNodeList()
+	{
+		for (int x = 0; x < grid.GetWidth(); x++)
+		{
+			for (int y = 0; y < grid.GetHeight(); y++)
+			{
+				PathNode node = GetNode(x, y);
+				node.worldX = grid.GetWorldPosition(node.x, node.z).x;
+				node.worldZ = grid.GetWorldPosition(node.x, node.z).z;
+				pathNodeList.Add(node);
+			}
+		}
+	}
+
+	public void DebugDrawSelectables()
+	{
+		foreach(PathNode pathNode in pathNodeList)
+		{
+			if (pathNode.selectable)
+			Debug.DrawRay(new Vector3(pathNode.worldX + 2.5f, 0, pathNode.worldZ + 2.5f), Vector3.up, Color.blue, 0.5f);
+		}
 	}
 
 	public void UpdateObstacles(GridXZ<PathNode> grid)
 	{
 		float cellSize = grid.GetCellSize();
-		for (int x = 0; x < grid.GetWidth(); x++)
+		
+		foreach(PathNode pathNode in pathNodeList)
 		{
-			for (int y = 0; y < grid.GetHeight(); y++)
+			int x = pathNode.x;
+			int z = pathNode.z;
+
+			Vector3 worldPosition = grid.GetWorldPosition(x, z);
+			Vector3 centroNodo = new Vector3(worldPosition.x + cellSize / 2, 0, worldPosition.z + cellSize / 2);
+			//Debug.Log("Soy la casilla " + pathNode.ToStringFull() +"mi posición real en el mundo es " + grid.GetWorldPosition(pathNode.x, pathNode.z));
+
+			Collider[] hits = Physics.OverlapBox(centroNodo, new Vector3(cellSize / 2.5f, cellSize / 2.5f, cellSize / 2.5f), Quaternion.identity, LayerMask.GetMask("Obstacles"));
+
+			if (hits?.Length > 0)
 			{
-				PathNode nodoLocalizado = GetNode(x, y);
-				Vector3 worldPosition = grid.GetWorldPosition(nodoLocalizado.x, nodoLocalizado.z);
-				Vector3 centroNodo = new Vector3(worldPosition.x + cellSize / 2, 0, worldPosition.z + cellSize / 2);
-				Collider[] hits = Physics.OverlapBox(centroNodo, new Vector3(cellSize / 2.5f, cellSize / 2.5f, cellSize / 2.5f), Quaternion.identity, LayerMask.GetMask("Obstacles"));
-				if (hits?.Length > 0)
-				{
-					nodoLocalizado.SetIsWalkable(false);
-
-					//foreach (Collider c in hits)
-					//{
-					//	nodoLocalizado.SetIsWalkable(false);
-					//	Debug.Log("Soy la casilla " + nodoLocalizado.ToString() + " isWalkable: " + nodoLocalizado.isWalkable + " mi posición real en el mundo es " + grid.GetWorldPosition(nodoLocalizado.x, nodoLocalizado.z) + "he golpeado con " + c.transform.gameObject.name);
-					//}
-				}
-
+				pathNode.SetIsWalkable(false);
 			}
+
 		}
+		
 	}
+
 
 	public GridXZ<PathNode> GetGrid()
 	{
@@ -139,56 +163,140 @@ public class Pathfinding
 		return null;
 	}
 
-	private List<PathNode> GetNeighbourList(PathNode currentNode)
+	private List<PathNode> GetNeighbourList(PathNode node)
 	{
 		List<PathNode> neighbourList = new List<PathNode>();
-
-		if (currentNode.x  - 1 >= 0)
+		PathNode posibleVecino;
+		if (node.x  - 1 >= 0)
 		{
 			//izquierda
-			neighbourList.Add(GetNode(currentNode.x - 1, currentNode.z));
+			if (!CheckWall(node, -Vector3.right))
+			{
+				posibleVecino = GetNode(node.x - 1, node.z);
+				if (posibleVecino.isWalkable)
+				{
+					neighbourList.Add(posibleVecino);
+				}
+			}
+
 
 			//izquierda abajo
-			if (currentNode.z - 1 >= 0)
+			if (!CheckWall(node, -Vector3.right + Vector3.back))
 			{
-				neighbourList.Add(GetNode(currentNode.x - 1, currentNode.z - 1));
+				posibleVecino = GetNode(node.x - 1, node.z - 1);
+				if (node.z - 1 >= 0)
+				{
+					if (posibleVecino.isWalkable)
+					{
+						neighbourList.Add(posibleVecino);
+					}
+				}
 			}
+
 			//izquierda arriba
-			if (currentNode.z + 1 < grid.GetHeight())
+			if (!CheckWall(node, -Vector3.right + -Vector3.back))
 			{
-				neighbourList.Add(GetNode(currentNode.x - 1, currentNode.z + 1));
+				posibleVecino = GetNode(node.x - 1, node.z + 1);
+				if (node.z + 1 < grid.GetHeight())
+				{
+					if (posibleVecino.isWalkable)
+					{
+						neighbourList.Add(posibleVecino);
+					}
+				}
 			}
+			
 		}
-		if (currentNode.x + 1 < grid.GetWidth())
+		if (node.x + 1 < grid.GetWidth())
 		{
 			//Derecha
-			neighbourList.Add(GetNode(currentNode.x + 1, currentNode.z));
+			if (!CheckWall(node, Vector3.right))
+			{
+				posibleVecino = GetNode(node.x + 1, node.z);
+				if (posibleVecino.isWalkable)
+				{
+					neighbourList.Add(posibleVecino);
+				}
+			}
+
 			//derecha abajo
-			if (currentNode.z - 1 >= 0)
+			if (!CheckWall(node, Vector3.right + -Vector3.back))
 			{
-				neighbourList.Add(GetNode(currentNode.x + 1, currentNode.z - 1));
+				posibleVecino = GetNode(node.x + 1, node.z - 1);
+				if (node.z - 1 >= 0)
+				{
+					if (posibleVecino.isWalkable)
+					{
+						neighbourList.Add(posibleVecino);
+					}
+				}
 			}
+
 			//derecha arriba
-			if (currentNode.z + 1 < grid.GetHeight())
+			if (!CheckWall(node, Vector3.right + Vector3.back))
 			{
-				neighbourList.Add(GetNode(currentNode.x + 1, currentNode.z + 1));
+				posibleVecino = GetNode(node.x + 1, node.z + 1);
+				if (node.z + 1 < grid.GetHeight())
+				{
+					if (posibleVecino.isWalkable)
+					{
+						neighbourList.Add(posibleVecino);
+					}
+				}
 			}
+			
 		}
 		//abajo
-		if (currentNode.z - 1 >= 0)
+		if (!CheckWall(node, Vector3.back))
 		{
-			neighbourList.Add(GetNode(currentNode.x, currentNode.z - 1));
+			posibleVecino = GetNode(node.x, node.z - 1);
+			if (node.z - 1 >= 0)
+			{
+				if (posibleVecino.isWalkable)
+				{
+					neighbourList.Add(posibleVecino);
+				}
 
+			}
 		}
+
+
 		//arriba
-		if (currentNode.z + 1 < grid.GetHeight())
+		if (!CheckWall(node, -Vector3.back))
 		{
-			neighbourList.Add(GetNode(currentNode.x, currentNode.z + 1));
+			posibleVecino = GetNode(node.x, node.z + 1);
+			if (node.z + 1 < grid.GetHeight())
+			{
+				if (posibleVecino.isWalkable)
+				{
+					neighbourList.Add(posibleVecino);
+				}
+			}
+
 		}
 
 		return neighbourList;
 	}
 
+	bool CheckWall(PathNode originNode, Vector3 direction)
+	{
+		bool wall = false;
+		RaycastHit hiteo;
+		Vector3 correccionAltura = new Vector3(0, 0.25f, 0);
+		Vector3 center = new Vector3(originNode.worldX + grid.GetCellSize() / 2, 0, originNode.worldZ + grid.GetCellSize() / 2);
+		if (Physics.Raycast(center + correccionAltura, direction, out hiteo, grid.GetCellSize(), LayerMask.GetMask("Wall")))
+		{
+			//Debug.Log("soy " + originNode.ToString() + " y me estoy chocando con " + hiteo.transform.gameObject.name); ;
+			//if (hiteo.collider.CompareTag("Muro"))
+			//{
+				wall = true;
+				//CheckRelativeCoverages(hiteo.collider.gameObject);
+			//}
+
+		}
+
+		return wall;
+	}
 	private PathNode GetNode(int x, int z)
 	{
 		return grid.GetGridObject(x, z);
@@ -229,18 +337,57 @@ public class Pathfinding
 		return lowerFCostNode;
 	}
 
-	public void GetCurrentNode()
+	public PathNode GetCurrentNode()
 	{
-		TacticUnity currentUnity = CombateManager.instance.currentUnity;
-		PathNode current = GetNode(Mathf.RoundToInt(currentUnity.transform.position.x / grid.GetCellSize()), Mathf.RoundToInt(currentUnity.transform.position.z / grid.GetCellSize()));
-		Debug.Log("El jugador actual es " + currentUnity.name + " y está en la casilla " + current.ToString());
+		TacticUnity currentUnity = CombateManager.instance.GetCurrentUnity();
+		return GetNode(Mathf.FloorToInt(currentUnity.transform.position.x / grid.GetCellSize()), Mathf.FloorToInt(currentUnity.transform.position.z / grid.GetCellSize()));
+		 
+	}
+	void ClearSelectableNodes()
+	{
+		if (selectableNodes.Count > 0)
+		{
+			foreach(PathNode node in selectableNodes)
+			{
+				node.Reset();
+			}
+		}
+		selectableNodes.Clear();
 	}
 
 	public void FindSelectableNodes()
 	{
-		selectableNodes.Clear();
+		ClearSelectableNodes();
 		//esto a lo mejor solo es para el player principal, ya veremos
+		PathNode currentNode = GetCurrentNode();
+		//Debug.Log("La casilla actual es: " + currentNode.ToString());
+		
 		Queue<PathNode> process = new Queue<PathNode>();
-		GetCurrentNode();
+
+		process.Enqueue(currentNode);
+		currentNode.visited = true;
+
+		while(process.Count > 0)
+		{
+			Debug.Log("jkldsadlkas");
+			PathNode node = process.Dequeue();
+			selectableNodes.Add(node);
+			node.selectable = true;
+
+			if (node.distance < CombateManager.instance.GetCurrentUnity().combatData.movementRange)
+			{
+				foreach(PathNode casilla in GetNeighbourList(node))
+				{
+					if (!casilla.visited)
+					{
+						casilla.cameFromNode = node;
+						casilla.visited = true;
+						casilla.distance = 1 + node.distance;
+						process.Enqueue(casilla);
+					}
+				}
+			}
+			
+		}
 	}
 }
