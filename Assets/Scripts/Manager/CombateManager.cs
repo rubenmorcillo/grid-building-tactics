@@ -73,7 +73,7 @@ public class CombateManager : MonoBehaviour
         pathfinding.GetGrid().GetXZ(Mouse3D.GetMouseWorldPosition(), out int x, out int z);
         if (pathfinding.GetGrid().GetGridObject(x, z).selectable)
         {
-            List<PathNode> path = pathfinding.FindPath(0, 0, x, z);
+            List<PathNode> path = pathfinding.FindPath(pathfinding.GetCurrentNode().x, pathfinding.GetCurrentNode().z, x, z);
 
 
             //DEBUG DRAWLINE
