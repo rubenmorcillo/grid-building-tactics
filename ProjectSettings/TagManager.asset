@@ -7,6 +7,7 @@ TagManager:
   - Suelo
   - Interactuable
   - Enemigo
+  - EquipoA
   layers:
   - Default
   - TransparentFX

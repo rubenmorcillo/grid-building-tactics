@@ -514,7 +514,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81f41b48d65714649872690fb46a92b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentUnity: {fileID: 401273285}
   gridWidth: 12
   gridHeight: 12
   cellSize: 5
@@ -522,6 +521,7 @@ MonoBehaviour:
   movingUnitTest: {fileID: 401273284}
   showDebug: 0
   crearTilesMapa: 0
+  currentUnity: {fileID: 401273285}
 --- !u!1 &304645998
 GameObject:
   m_ObjectHideFlags: 0
@@ -714,9 +714,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   combatData:
-    maxMovementPoints: 5
-    currentMovementPoints: 5
-    accionRealizada: 0
+    movementRange: 5
+    jumpHeight: 1
+    movementDone: 0
+    actionDone: 0
+    isAlive: 1
+    initiative: 3
+  myTurn: 0
 --- !u!1 &556754850
 GameObject:
   m_ObjectHideFlags: 0
@@ -1318,7 +1322,7 @@ PrefabInstance:
     - target: {fileID: 7487250883646890668, guid: e40917820a918ff4a9f43f3bd4beece9,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.5
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 7487250883646890668, guid: e40917820a918ff4a9f43f3bd4beece9,
         type: 3}
@@ -1328,7 +1332,7 @@ PrefabInstance:
     - target: {fileID: 7487250883646890668, guid: e40917820a918ff4a9f43f3bd4beece9,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.5
+      value: 12.5
       objectReference: {fileID: 0}
     - target: {fileID: 7487250883646890668, guid: e40917820a918ff4a9f43f3bd4beece9,
         type: 3}

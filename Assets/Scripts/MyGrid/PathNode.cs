@@ -8,19 +8,25 @@ public class PathNode
 	private GridXZ<PathNode> grid;
 	public int x;
 	public int z;
+	public float worldX;
+	public float worldZ;
 
 	public int gCost;
 	public int hCost;
 	public int fCost;
+	public bool visited;
 
 	public bool isWalkable;
 	public bool current = false;
 	public bool selectable = false;
-
+	public bool target = false;
 
 	public PathNode cameFromNode;
 
-	//La sugerenciad e CHAPGPT para precargar los vecinos
+	public int distance;
+
+
+	//La sugerencia de chatGPT para precargar los vecinos
 	//public PathNode[] Neighbours { get; private set; }
 
 
@@ -30,6 +36,7 @@ public class PathNode
 		this.x = x;
 		this.z = z;
 
+		visited = false;
 		isWalkable = true;
 
 		// Pre-calculate neighbours
@@ -55,9 +62,40 @@ public class PathNode
 	{
 		fCost = gCost + hCost;
 	}
+
+
+	void Reset()
+	{
+		//coveragesDirections.Clear();
+		//coveragesValidDirections.Clear();
+		current = false;
+		target = false;
+		selectable = false;
+		//offeringCoverage = false;
+
+		visited = false;
+		//cameFromNode = null; 
+		distance = 0;
+
+		//f = g = h = 0;
+	}
+
 	public override string ToString()
 	{
 		return x + "," + z;
+	}
+
+	public string ToStringFull()
+	{
+		return x + "," + z
+		+ "\nCURRENT: " + current
+			+ "\nTarget: " + target
+			+ "\nWalkable: " + isWalkable
+			+ "\nselectable: " + selectable
+			+ "\ndistance: " + distance
+			+ "\ngCost: " + gCost
+			+ "\nhCost: " + hCost
+			+ "\nfCost: " + fCost;
 	}
 
 

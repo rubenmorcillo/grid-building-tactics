@@ -13,7 +13,8 @@ public class CombateManager : MonoBehaviour
             return _instance;
         }
     }
-    public TacticUnity currentUnity;
+
+
 
     [SerializeField] private int gridWidth;
     [SerializeField] private int gridHeight;
@@ -26,20 +27,43 @@ public class CombateManager : MonoBehaviour
     private GridXZ<GridBuildingSystem3D.GridObject> grid;
 
     private Pathfinding pathfinding;
-    
+
+    [SerializeField] TacticUnity currentUnity;
+    [SerializeField] TurnManager turnManager;
+
+
     void Start()
     {
+        _instance = this;
         if (crearTilesMapa)
         {
             grid = new GridXZ<GridBuildingSystem3D.GridObject>(gridWidth, gridHeight, cellSize, new Vector3(0, 0, 0), (GridXZ<GridBuildingSystem3D.GridObject> g, int x, int y) => new GridBuildingSystem3D.GridObject(g, x, y, showDebug));
             CrearTilesMapa();
         }
         pathfinding = new Pathfinding(gridWidth, gridHeight, cellSize);
+        if (turnManager == null)
+        {
+            turnManager = new TurnManager();
+        }
+
+        //CHAPUZAAA temporal: TODO -> se deben recuperar todas las unidades al inicio del combate
+        turnManager.AddUnit(currentUnity);
     }
 
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            pathfinding.FindSelectableNodes();
+        }
+        pathfinding.DebugDrawSelectables();
+
+
+        turnManager?.Update();
+
+		
+
         if (Input.GetMouseButton(0))
         {
             //Vector3 mouseWorldPosition = UtilsClass.GetMouseWorldPositionWithZ();
@@ -56,6 +80,16 @@ public class CombateManager : MonoBehaviour
         }
 
     }
+    public void SetCurrentUnity(TacticUnity currentUnity)
+	{
+        this.currentUnity = currentUnity;
+        pathfinding.FindSelectableNodes();
+	}
+    public TacticUnity GetCurrentUnity()
+	{
+        return currentUnity;
+	}
+    
     void CrearTilesMapa()
     {
         for (int x = 0; x < gridWidth; x++)

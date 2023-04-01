@@ -23,7 +23,6 @@ public class GridXZ<TGridObject> {
         public int x;
         public int z;
     }
-
     private int width;
     private int height;
     private float cellSize;
