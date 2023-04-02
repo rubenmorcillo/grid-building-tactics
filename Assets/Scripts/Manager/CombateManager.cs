@@ -30,6 +30,7 @@ public class CombateManager : MonoBehaviour
 
     [SerializeField] TacticUnity currentUnity;
     [SerializeField] TurnManager turnManager;
+    [SerializeField] PathRenderer pathRenderer;
 
 
     void Start()
@@ -45,6 +46,10 @@ public class CombateManager : MonoBehaviour
         {
             turnManager = new TurnManager();
         }
+        if (pathRenderer == null)
+		{
+            pathRenderer = gameObject.AddComponent<PathRenderer>();
+		}
 
         //CHAPUZAAA temporal: TODO -> se deben recuperar todas las unidades al inicio del combate
         turnManager.AddUnit(currentUnity);
@@ -79,11 +84,11 @@ public class CombateManager : MonoBehaviour
             //DEBUG DRAWLINE
             if (path != null)
             {
-                Debug.Log(path.Count);
                 for (int i = 0; i < path.Count - 1; i++)
                 {
                     Vector3 offset = new Vector3(pathfinding.GetGrid().GetCellSize() / 2, 0, pathfinding.GetGrid().GetCellSize() / 2);
-                    Debug.DrawLine(new Vector3(path[i].x, 0.5f, path[i].z) * pathfinding.GetGrid().GetCellSize() + offset, new Vector3(path[i + 1].x, 0.5f, path[i + 1].z) * pathfinding.GetGrid().GetCellSize() + offset, Color.green);
+                    pathRenderer.DrawPath(pathfinding.pathToVectorArray(path));
+                    //Debug.DrawLine(new Vector3(path[i].x, 0.5f, path[i].z) * pathfinding.GetGrid().GetCellSize() + offset, new Vector3(path[i + 1].x, 0.5f, path[i + 1].z) * pathfinding.GetGrid().GetCellSize() + offset, Color.green);
                 }
             }
         }
@@ -95,7 +100,10 @@ public class CombateManager : MonoBehaviour
         }
 
     }
-
+    public Pathfinding GetPathfinding()
+	{
+        return pathfinding;
+	}
     public void SetCurrentUnity(TacticUnity currentUnity)
 	{
         this.currentUnity = currentUnity;

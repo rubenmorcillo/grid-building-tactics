@@ -71,6 +71,19 @@ public class Pathfinding
 		
 	}
 
+	public Vector3[] pathToVectorArray(List<PathNode> pathNodeList)
+	{
+		List<Vector3> pathArray = new List<Vector3>();
+
+		foreach (PathNode pathNode in pathNodeList)
+		{
+			float offsetY = 0.5f;
+			Vector3 pathPoint = new Vector3(pathNode.worldX + (grid.GetCellSize() / 2), offsetY, pathNode.worldZ + (grid.GetCellSize() / 2));
+			pathArray.Add(pathPoint);
+			
+		}
+		return pathArray.ToArray();
+	}
 
 	public GridXZ<PathNode> GetGrid()
 	{
