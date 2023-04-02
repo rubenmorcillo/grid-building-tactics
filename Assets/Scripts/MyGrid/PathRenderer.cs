@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Experimental.Rendering.Universal;
 using Unity.Collections;
+using System.Linq;
 
 public class PathRenderer : MonoBehaviour
 {
@@ -49,67 +50,103 @@ public class PathRenderer : MonoBehaviour
 
     public void DrawShape(Vector3[] points)
     {
-        points = SimplifiedPointsTo3D(SortPointsByAngle(GetSimplifiedPoints(points), new Vector2(0, 0)));
-        
-        lineRenderer.positionCount = points.Length;
+		points = SimplifiedPointsTo3D(SortPointsByAngle(GetSimplifiedPoints(points), new Vector2(0, 0)));
 
-        for (int i = 0; i < points.Length; i++)
-        {
-            lineRenderer.SetPosition(i, points[i]);
-        }
+		lineRenderer.positionCount = points.Length;
 
-        lineRenderer.loop = true; // Closes the shape
-    }
+		for (int i = 0; i < points.Length; i++)
+		{
+			lineRenderer.SetPosition(i, points[i]);
+		}
+
+		lineRenderer.loop = true; // Closes the shape
+	}
 
 	public void CreateSelectableNodesMesh(Vector3[] verts, Material material)
 	{
 
-        //Debug.Log("tengo " + verts.Length + " puntos");
-        int i = 0;
-        foreach(Vector3 vert in verts)
-		{
-            i++;
-            //Debug.Log("NORMAL " + i + " ->" + vert);
-        }
-        Debug.Log("vamos a ordenarlos");
-        verts = SimplifiedPointsTo3D(SortPointsByAngle(GetSimplifiedPoints(verts), new Vector2(9, 16)));
-        i = 0;
-        foreach (Vector3 vert in verts)
+        Debug.Log("tengo " + verts.Length + " puntos");
+        ConnectVertices(new List<Vector3>(verts)).ForEach(segment => Debug.Log("SEGMENTO: "+segment));
+        //Debug.Log()
+        //      int i = 0;
+        //      foreach(Vector3 vert in verts)
+        //{
+        //          i++;
+        //          Debug.Log("NORMAL " + i + " ->" + vert);
+        //      }
+        //verts = SimplifiedPointsTo3D(SortPointsByAngle(GetSimplifiedPoints(verts), new Vector2(CalculateCenter(verts).x, CalculateCenter(verts).z)));
+        //i = 0;
+        //foreach (Vector3 vert in verts)
+        //{
+        //    i++;
+        //    Debug.Log("ORDENADO "+i+" ->" + vert);
+
+        //}
+        List<Vector3> lista = new List<Vector3>(verts);
+		CreateMesh(lista.OrderBy(p => p.x).ThenBy(p => p.z).ToList().ToArray());
+		List<Vector2> convexHull = GrahamScan.ConvexHull(new List<Vector3>(verts));
+        //convexHull.ForEach(c => Debug.Log("CONVEX HULL: "+c));
+		//CreateMesh(SimplifiedPointsTo3D(convexHull));
+
+		//Debug.Log("mientras que con el convexHull tendría " + convexHull.Count);
+
+		//i = 0;
+		//foreach (Vector2 vert in convexHull)
+		//{
+		//	i++;
+		//	Debug.Log("GRAHAM " + i + " ->" + vert);
+
+		//}
+		//      for (int z = 0; z < SimplifiedPointsTo3D(convexHull).Length; z++)
+		//      {
+		//          Debug.Log("GRAHAM3D " + z + " ->" + SimplifiedPointsTo3D(convexHull)[z]);
+		//      }
+
+	}
+    public List<(Vector3, Vector3)> ConnectVertices(List<Vector3> vertices)
+    {
+        List<(Vector3, Vector3)> segments = new List<(Vector3, Vector3)>();
+
+        for (int i = 0; i < vertices.Count - 1; i++)
         {
-            i++;
-            //Debug.Log("ORDENADO "+i+" ->" + vert);
+            Vector3 start = vertices[i];
+            Vector3 end = vertices[i + 1];
 
+            // Comprobar si los dos puntos están en la misma fila o columna
+            if (start.x == end.x || start.z == end.z)
+            {
+                // Comprobar si hay obstáculos intermedios
+                Vector3 direction = (end - start).normalized;
+                float distance = Vector3.Distance(start, end);
+                bool hasObstacle = false;
+
+                for (float d = 0f; d < distance; d += 0.1f)
+                {
+                    Vector3 point = start + direction * d;
+                    int x = Mathf.RoundToInt(point.x);
+                    int z = Mathf.RoundToInt(point.z);
+
+                    if (CombateManager.instance.GetPathfinding().GetRealNode(x, z) != null)
+					{
+                        if (!CombateManager.instance.GetPathfinding().GetRealNode(x, z).isWalkable)
+                        {
+                            hasObstacle = true;
+                            break;
+                        }
+                    }
+                   
+                }
+
+                if (!hasObstacle)
+                {
+                    segments.Add((start, end));
+                }
+            }
         }
 
-        //MiOrden(new List<Vector3>(verts));
-        //CreateMesh(verts);
-
-
-        List<Vector2> convexHull = GrahamScan.ConvexHull(new List<Vector3>(verts));
-		i = 0;
-		foreach (Vector2 vert in convexHull)
-		{
-			i++;
-			//Debug.Log("GRAHAM " + i + " ->" + vert);
-
-		}
-		CreateMesh(SimplifiedPointsTo3D(convexHull));
-
+        return segments;
     }
 
-    List<Vector3> MiOrden(List<Vector3> points)
-	{
-        List<Vector3> sortedPoints = new List<Vector3>();
-		foreach (Vector3 point in points)
-		{
-            Vector3 normalized = new Vector3(0, 4, 0);
-            //Debug.Log("voy a buscar " + point);
-            //Debug.Log(pathfinding.GetGrid().GetGridObject(Mathf.FloorToInt(point.x * pathfinding.GetGrid().GetCellSize()), Mathf.FloorToInt(point.z * pathfinding.GetGrid().GetCellSize())));
-            //Debug.Log("tengo "+ pathfinding.GetGrid().GetGridObject(Mathf.FloorToInt(point.x), Mathf.FloorToInt(point.z)).neighbours?.Count +" vecinos");
-			//if (point.)
-		}
-		return sortedPoints;
-	}
 
     void CreateMesh(Vector3[] convexHull)
     {
@@ -189,6 +226,7 @@ public class PathRenderer : MonoBehaviour
             float offsetY = 0.35f;
             points3D.Add(new Vector3(simplifiedPoint.x, offsetY, simplifiedPoint.y));
 		}
+        
         return points3D.ToArray();
 	}
 }

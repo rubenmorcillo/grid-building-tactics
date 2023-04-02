@@ -40,25 +40,26 @@ public class GrahamScan
                 return (a - lowestPoint).magnitude.CompareTo((b - lowestPoint).magnitude);
             }
         });
+       
+		// Añadimos el primer punto al stack y recorremos los demás, eliminando los puntos que no forman parte de la envolvente
+		Stack<Vector2> hull = new Stack<Vector2>();
+		hull.Push(points2D[0]);
+		hull.Push(points2D[1]);
+		for (int i = 2; i < points2D.Count; i++)
+		{
+			Vector2 top = hull.Pop();
+			while (VectorClockwise(top, hull.Peek(), points2D[i]))
+			{
+				top = hull.Pop();
+			}
+			//hull.Pop();
+			hull.Push(top);
+			hull.Push(points2D[i]);
+		}
 
-        // Añadimos el primer punto al stack y recorremos los demás, eliminando los puntos que no forman parte de la envolvente
-        Stack<Vector2> hull = new Stack<Vector2>();
-        hull.Push(points2D[0]);
-        hull.Push(points2D[1]);
-        for (int i = 2; i < points2D.Count; i++)
-        {
-            Vector2 top = hull.Pop();
-            while (VectorClockwise(top, hull.Peek(), points2D[i]))
-            {
-                top = hull.Pop();
-            }
-            hull.Push(top);
-            hull.Push(points2D[i]);
-        }
-
-        // Devolvemos la envolvente convexa
-        return new List<Vector2>(hull.ToArray());
-    }
+		// Devolvemos la envolvente convexa
+		return new List<Vector2>(hull.ToArray());
+	}
 
     // Función auxiliar para determinar si el punto c está a la derecha de la línea ab
     private static bool VectorClockwise(Vector2 a, Vector2 b, Vector2 c)

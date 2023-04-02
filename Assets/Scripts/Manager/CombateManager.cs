@@ -62,7 +62,7 @@ public class CombateManager : MonoBehaviour
       
         pathfinding.FindSelectableNodes();
         //pathRenderer.CreateSelectableNodesMesh(pathfinding.GetSelectableNodesVerts(), meshMaterial);
-        pathRenderer.DrawShape(pathfinding.GetSelectableNodesVertsInWorld());
+        //pathRenderer.DrawShape(pathfinding.GetSelectableNodesVertsInWorld());
         
         pathfinding.DebugDrawSelectables();
 

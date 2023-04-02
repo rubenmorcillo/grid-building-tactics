@@ -38,8 +38,6 @@ public class MovingUnitTest : MonoBehaviour
             targetPosition.y -= Pathfinding.Instance.GetGrid().GetCellSize() / 2;
             if (Vector3.Distance(transform.position, targetPosition) > 1f)
 			{
-                Debug.Log(pathVectorList.Count);
-
                 Vector3 moveDir = (targetPosition - transform.position).normalized;
 
                 float distanceBefore = Vector3.Distance(transform.position, targetPosition);

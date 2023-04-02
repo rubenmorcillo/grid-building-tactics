@@ -37,7 +37,7 @@ public class Pathfinding
 			}
 		}
 	}
-
+	
 	public void DebugDrawSelectables()
 	{
 		foreach(PathNode pathNode in pathNodeList)
@@ -182,7 +182,21 @@ public class Pathfinding
 		//out of nodes on the openList
 		return null;
 	}
+	public PathNode GetRealNode(int x, int z)
+	{
+		PathNode pathNode = null;
 
+		foreach(PathNode node in pathNodeList)
+		{
+			//Debug.Log("voy a comprobar con " + node);
+			if (node.x == x  && node.z == z)
+			{
+				pathNode = node;
+				break;
+			}
+		}
+		return pathNode;
+	}
 	private List<PathNode> GetNeighbourList(PathNode node)
 	{
 		List<PathNode> neighbourList = new List<PathNode>();
@@ -379,20 +393,22 @@ public class Pathfinding
 		List<Vector3> verts = new List<Vector3>();
 		foreach (PathNode pathNode in selectableNodes)
 		{
-			if (pathNode.neighbours.Count == 7 ||pathNode.neighbours.Count == 3)
-			{
+			//if (pathNode.neighbours.Count == 7 || pathNode.neighbours.Count == 3 || pathNode.neighbours.Count == 0)
+			//{
 				Debug.Log("Hola de nuevo, soy el nodo: " + pathNode.ToString() + " y tengo " + pathNode.neighbours.Count + " vecinos");
-			}
-			float offsetY = 0.35f;
-			Vector3 vert1 = new Vector3(pathNode.worldX, offsetY, pathNode.worldZ);
-			Vector3 vert2 = new Vector3(pathNode.worldX + grid.GetCellSize(), offsetY, pathNode.worldZ);
-			Vector3 vert3 = new Vector3(pathNode.worldX, offsetY, pathNode.worldZ + grid.GetCellSize());
-			Vector3 vert4 = new Vector3(pathNode.worldX + grid.GetCellSize(), offsetY, pathNode.worldZ + grid.GetCellSize());
-			if (!verts.Contains(vert1)) verts.Add(vert1);
-			if (!verts.Contains(vert2)) verts.Add(vert2);
-			if (!verts.Contains(vert3)) verts.Add(vert3);
-			if (!verts.Contains(vert4)) verts.Add(vert4);
+				float offsetY = 0.35f;
+				Vector3 vert1 = new Vector3(pathNode.worldX, offsetY, pathNode.worldZ);
+				Vector3 vert2 = new Vector3(pathNode.worldX + grid.GetCellSize(), offsetY, pathNode.worldZ);
+				Vector3 vert3 = new Vector3(pathNode.worldX, offsetY, pathNode.worldZ + grid.GetCellSize());
+				Vector3 vert4 = new Vector3(pathNode.worldX + grid.GetCellSize(), offsetY, pathNode.worldZ + grid.GetCellSize());
+				if (!verts.Contains(vert1)) verts.Add(vert1);
+				if (!verts.Contains(vert2)) verts.Add(vert2);
+				if (!verts.Contains(vert3)) verts.Add(vert3);
+				if (!verts.Contains(vert4)) verts.Add(vert4);
+			//}
+			
 		}
+		
 		return verts.ToArray();
 
 		//List<Vector3> verts = new List<Vector3>();
@@ -407,7 +423,7 @@ public class Pathfinding
 		//		//}
 		//		if (AreAdjacent(selectableNodes[i], selectableNodes[j]))
 		//		{
-		//			List<PathNode> realNeighbours = new List<PathNode>(); 
+		//			List<PathNode> realNeighbours = new List<PathNode>();
 		//			foreach (PathNode node in selectableNodes[i].neighbours)
 		//			{
 		//				if (node.selectable)
@@ -418,7 +434,7 @@ public class Pathfinding
 
 		//			if (realNeighbours.Count != 0)
 		//			{
-		//				Debug.Log("YIHAAA SOY: " + selectableNodes[i] + " y debo ser una esquina porque mis vecinos reales son " + realNeighbours.Count);
+		//				//Debug.Log("YIHAAA SOY: " + selectableNodes[i] + " y debo ser una esquina porque mis vecinos reales son " + realNeighbours.Count);
 		//				for (int k = 0; k < realNeighbours.Count; k++)
 		//				{
 		//					//Debug.Log("vecino: " + realNeighbours[k].ToString());
@@ -442,7 +458,7 @@ public class Pathfinding
 		//		}
 		//	}
 		//}
-		return verts.ToArray();
+		//return verts.ToArray();
 	}
 
 	bool AreAdjacent(PathNode node1, PathNode node2)
