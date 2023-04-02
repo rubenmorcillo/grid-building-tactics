@@ -31,6 +31,7 @@ public class CombateManager : MonoBehaviour
     [SerializeField] TacticUnity currentUnity;
     [SerializeField] TurnManager turnManager;
     [SerializeField] PathRenderer pathRenderer;
+    [SerializeField] Material meshMaterial;
 
 
     void Start()
@@ -60,6 +61,9 @@ public class CombateManager : MonoBehaviour
     {
       
         pathfinding.FindSelectableNodes();
+        //pathRenderer.CreateSelectableNodesMesh(pathfinding.GetSelectableNodesVerts(), meshMaterial);
+        pathRenderer.DrawShape(pathfinding.GetSelectableNodesVertsInWorld());
+        
         pathfinding.DebugDrawSelectables();
 
 
@@ -86,7 +90,7 @@ public class CombateManager : MonoBehaviour
             {
                 for (int i = 0; i < path.Count - 1; i++)
                 {
-                    Vector3 offset = new Vector3(pathfinding.GetGrid().GetCellSize() / 2, 0, pathfinding.GetGrid().GetCellSize() / 2);
+                    //Vector3 offset = new Vector3(pathfinding.GetGrid().GetCellSize() / 2, 0, pathfinding.GetGrid().GetCellSize() / 2);
                     pathRenderer.DrawPath(pathfinding.pathToVectorArray(path));
                     //Debug.DrawLine(new Vector3(path[i].x, 0.5f, path[i].z) * pathfinding.GetGrid().GetCellSize() + offset, new Vector3(path[i + 1].x, 0.5f, path[i + 1].z) * pathfinding.GetGrid().GetCellSize() + offset, Color.green);
                 }
@@ -94,9 +98,13 @@ public class CombateManager : MonoBehaviour
         }
         if (Input.GetMouseButton(0))
         {
-            //Vector3 mouseWorldPosition = UtilsClass.GetMouseWorldPositionWithZ();
-         
-            movingUnitTest.SetTargetPosition(Mouse3D.GetMouseWorldPosition());
+            pathRenderer.CreateSelectableNodesMesh(pathfinding.GetSelectableNodesVertsInWorld(), meshMaterial);
+
+            if (pathfinding.GetGrid().GetGridObject(x, z).selectable)
+			{
+                movingUnitTest.SetTargetPosition(Mouse3D.GetMouseWorldPosition());
+            }
+
         }
 
     }
@@ -107,7 +115,7 @@ public class CombateManager : MonoBehaviour
     public void SetCurrentUnity(TacticUnity currentUnity)
 	{
         this.currentUnity = currentUnity;
-        pathfinding.FindSelectableNodes();
+        //pathfinding.FindSelectableNodes(); //creo que aquí no hace ninguna falta, lo tengo en el FixedUpdate
 	}
     public TacticUnity GetCurrentUnity()
 	{

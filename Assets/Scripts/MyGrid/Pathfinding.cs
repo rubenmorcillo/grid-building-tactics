@@ -78,7 +78,10 @@ public class Pathfinding
 		foreach (PathNode pathNode in pathNodeList)
 		{
 			float offsetY = 0.5f;
-			Vector3 pathPoint = new Vector3(pathNode.worldX + (grid.GetCellSize() / 2), offsetY, pathNode.worldZ + (grid.GetCellSize() / 2));
+
+			Vector3 offset = new Vector3(grid.GetCellSize() / 2, offsetY, grid.GetCellSize() / 2);
+
+			Vector3 pathPoint = new Vector3(pathNode.worldX , 0, pathNode.worldZ)  + offset;
 			pathArray.Add(pathPoint);
 			
 		}
@@ -90,6 +93,10 @@ public class Pathfinding
 		return grid;
 	}
 
+	public List<PathNode> GetSelectableNodes()
+	{
+		return selectableNodes;
+	}
 
 	public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 endWorldPosition)
 	{
@@ -186,6 +193,11 @@ public class Pathfinding
 			if (!CheckWall(node, -Vector3.right))
 			{
 				posibleVecino = GetNode(node.x - 1, node.z);
+				if (posibleVecino != null && posibleVecino.selectable)
+				{
+					node.posibleNeighbours.Add(posibleVecino);
+
+				}
 				if (posibleVecino.isWalkable)
 				{
 					neighbourList.Add(posibleVecino);
@@ -197,6 +209,12 @@ public class Pathfinding
 			if (!CheckWall(node, -Vector3.right + Vector3.back))
 			{
 				posibleVecino = GetNode(node.x - 1, node.z - 1);
+				if (posibleVecino != null && posibleVecino.selectable)
+				{
+					node.posibleNeighbours.Add(posibleVecino);
+
+				}
+				
 				if (node.z - 1 >= 0)
 				{
 					if (posibleVecino.isWalkable)
@@ -210,6 +228,12 @@ public class Pathfinding
 			if (!CheckWall(node, -Vector3.right + -Vector3.back))
 			{
 				posibleVecino = GetNode(node.x - 1, node.z + 1);
+				if (posibleVecino != null && posibleVecino.selectable)
+				{
+					node.posibleNeighbours.Add(posibleVecino);
+
+				}
+
 				if (node.z + 1 < grid.GetHeight())
 				{
 					if (posibleVecino.isWalkable)
@@ -226,6 +250,12 @@ public class Pathfinding
 			if (!CheckWall(node, Vector3.right))
 			{
 				posibleVecino = GetNode(node.x + 1, node.z);
+				if (posibleVecino != null && posibleVecino.selectable)
+				{
+					node.posibleNeighbours.Add(posibleVecino);
+
+				}
+
 				if (posibleVecino.isWalkable)
 				{
 					neighbourList.Add(posibleVecino);
@@ -236,6 +266,11 @@ public class Pathfinding
 			if (!CheckWall(node, Vector3.right + -Vector3.back))
 			{
 				posibleVecino = GetNode(node.x + 1, node.z - 1);
+				if (posibleVecino != null && posibleVecino.selectable)
+				{
+					node.posibleNeighbours.Add(posibleVecino);
+
+				}
 				if (node.z - 1 >= 0)
 				{
 					if (posibleVecino.isWalkable)
@@ -249,6 +284,12 @@ public class Pathfinding
 			if (!CheckWall(node, Vector3.right + Vector3.back))
 			{
 				posibleVecino = GetNode(node.x + 1, node.z + 1);
+				if (posibleVecino != null && posibleVecino.selectable)
+				{
+					node.posibleNeighbours.Add(posibleVecino);
+
+				}
+
 				if (node.z + 1 < grid.GetHeight())
 				{
 					if (posibleVecino.isWalkable)
@@ -263,6 +304,12 @@ public class Pathfinding
 		if (!CheckWall(node, Vector3.back))
 		{
 			posibleVecino = GetNode(node.x, node.z - 1);
+			if (posibleVecino != null && posibleVecino.selectable)
+			{
+				node.posibleNeighbours.Add(posibleVecino);
+
+			}
+
 			if (node.z - 1 >= 0)
 			{
 				if (posibleVecino.isWalkable)
@@ -278,6 +325,12 @@ public class Pathfinding
 		if (!CheckWall(node, -Vector3.back))
 		{
 			posibleVecino = GetNode(node.x, node.z + 1);
+			if (posibleVecino != null && posibleVecino.selectable)
+			{
+				node.posibleNeighbours.Add(posibleVecino);
+
+			}
+
 			if (node.z + 1 < grid.GetHeight())
 			{
 				if (posibleVecino.isWalkable)
@@ -287,7 +340,7 @@ public class Pathfinding
 			}
 
 		}
-
+		node.neighbours = neighbourList ;
 		return neighbourList;
 	}
 
@@ -356,6 +409,68 @@ public class Pathfinding
 		return GetNode(Mathf.FloorToInt(currentUnity.transform.position.x / grid.GetCellSize()), Mathf.FloorToInt(currentUnity.transform.position.z / grid.GetCellSize()));
 		 
 	}
+
+	public Vector3[] GetSelectableNodesVertsInWorld()
+	{
+		//List<Vector3> verts = new List<Vector3>();
+		//foreach (PathNode pathNode in selectableNodes)
+		//{
+		//	float offsetY = 0.35f;
+		//	Vector3 vert1 = new Vector3(pathNode.worldX, offsetY, pathNode.z);
+		//	Vector3 vert2 = new Vector3(pathNode.worldX + grid.GetCellSize(), offsetY, pathNode.worldZ);
+		//	Vector3 vert3 = new Vector3(pathNode.worldX , offsetY, pathNode.worldZ + grid.GetCellSize());
+		//	Vector3 vert4 = new Vector3(pathNode.worldX + grid.GetCellSize(), offsetY, pathNode.worldZ + grid.GetCellSize());
+		//	if (!verts.Contains(vert1))verts.Add(vert1);
+		//	if (!verts.Contains(vert2)) verts.Add(vert2);
+		//	if (!verts.Contains(vert3)) verts.Add(vert3);
+		//	if (!verts.Contains(vert4)) verts.Add(vert4);
+		//}
+		//return verts.ToArray();
+
+		List<Vector3> verts = new List<Vector3>();
+		for (int i = 0; i < selectableNodes.Count - 1; i++)
+		{
+			for (int j = i + 1; j < selectableNodes.Count; j++)
+			{
+				if (AreAdjacent(selectableNodes[i], selectableNodes[j]))
+				{
+					if (selectableNodes[i].posibleNeighbours.Count <= 3)
+					{
+						Debug.Log("YIHAAA SOY: " + selectableNodes[i] + " y debo ser una esquina porque mis vecinos son "+selectableNodes[i].posibleNeighbours.Count);
+						for (int k = 0; k < selectableNodes[i].posibleNeighbours.Count ; k++)
+						{
+							Debug.Log("vecino: " + selectableNodes[i].posibleNeighbours[k].ToString());
+
+						}
+					}
+					float offsetY = 0.35f;
+					Vector3 vert1 = new Vector3(selectableNodes[i].worldX, offsetY, selectableNodes[i].worldZ);
+					Vector3 vert2 = new Vector3(selectableNodes[i].worldX + grid.GetCellSize(), offsetY, selectableNodes[i].worldZ);
+					Vector3 vert3 = new Vector3(selectableNodes[i].worldX, offsetY, selectableNodes[i].worldZ + grid.GetCellSize());
+					Vector3 vert4 = new Vector3(selectableNodes[j].worldX + grid.GetCellSize(), offsetY, selectableNodes[j].worldZ + grid.GetCellSize());
+					Vector3 vert5 = new Vector3(selectableNodes[j].worldX, offsetY, selectableNodes[j].worldZ + grid.GetCellSize());
+					Vector3 vert6 = new Vector3(selectableNodes[j].worldX + grid.GetCellSize(), offsetY, selectableNodes[j].worldZ);
+
+					if (!verts.Contains(vert1)) verts.Add(vert1);
+					if (!verts.Contains(vert2)) verts.Add(vert2);
+					if (!verts.Contains(vert3)) verts.Add(vert3);
+					if (!verts.Contains(vert4)) verts.Add(vert4);
+					if (!verts.Contains(vert5)) verts.Add(vert5);
+					if (!verts.Contains(vert6)) verts.Add(vert6);
+				}
+			}
+		}
+		return verts.ToArray();
+	}
+
+	bool AreAdjacent(PathNode node1, PathNode node2)
+	{
+		int dx = Mathf.Abs(node1.x - node2.x);
+		int dz = Mathf.Abs(node1.z - node2.z);
+		return (dx == 1 * grid.GetCellSize() && dz == 0) || (dx == 0 && dz == 1 * grid.GetCellSize());
+	}
+
+	
 	void ClearSelectableNodes()
 	{
 		if (selectableNodes.Count > 0)
