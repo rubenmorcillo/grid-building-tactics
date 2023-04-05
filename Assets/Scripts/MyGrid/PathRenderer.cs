@@ -5,22 +5,20 @@ using UnityEngine.Rendering;
 using UnityEngine.Experimental.Rendering.Universal;
 using Unity.Collections;
 using System.Linq;
+using System;
 
 public class PathRenderer : MonoBehaviour
 {
-    public Pathfinding pathfinding;
     public Color lineColor;
 
     private LineRenderer lineRenderer;
 
-    private MeshFilter meshFilter;
+    //private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
 
 
     private void Start()
     {
-        
-        
         // Agrega un Line Renderer al objeto
         lineRenderer = gameObject.AddComponent<LineRenderer>();
 
@@ -41,11 +39,15 @@ public class PathRenderer : MonoBehaviour
     public void DrawPath(Vector3[] path)
     {
         // Configura el Line Renderer para usar los puntos de la línea que se están dibujando en el script
-        lineRenderer.positionCount = path.Length;
-        for (int i = 0; i < path.Length; i++)
-        {
-            lineRenderer.SetPosition(i, path[i] + new Vector3(0, 0.5f, 0)); // Añade un desplazamiento vertical para que la línea sea visible por encima del terreno
+        if (lineRenderer != null)
+		{
+            lineRenderer.positionCount = path.Length;
+            for (int i = 0; i < path.Length; i++)
+            {
+                lineRenderer.SetPosition(i, path[i] + new Vector3(0, 0.5f, 0)); // Añade un desplazamiento vertical para que la línea sea visible por encima del terreno
+            }
         }
+        
     }
 
     public void DrawShape(Vector3[] points)
@@ -62,91 +64,84 @@ public class PathRenderer : MonoBehaviour
 		lineRenderer.loop = true; // Closes the shape
 	}
 
-	public void CreateSelectableNodesMesh(Vector3[] verts, Material material)
+    public void CombineMeshList(List<MeshFilter> meshFiltersList)
 	{
+        CombineInstance[] combineInstances = new CombineInstance[meshFiltersList.Count];
 
-        Debug.Log("tengo " + verts.Length + " puntos");
-        ConnectVertices(new List<Vector3>(verts)).ForEach(segment => Debug.Log("SEGMENTO: "+segment));
-        //Debug.Log()
-        //      int i = 0;
-        //      foreach(Vector3 vert in verts)
-        //{
-        //          i++;
-        //          Debug.Log("NORMAL " + i + " ->" + vert);
-        //      }
-        //verts = SimplifiedPointsTo3D(SortPointsByAngle(GetSimplifiedPoints(verts), new Vector2(CalculateCenter(verts).x, CalculateCenter(verts).z)));
-        //i = 0;
-        //foreach (Vector3 vert in verts)
-        //{
-        //    i++;
-        //    Debug.Log("ORDENADO "+i+" ->" + vert);
-
-        //}
-        List<Vector3> lista = new List<Vector3>(verts);
-		CreateMesh(lista.OrderBy(p => p.x).ThenBy(p => p.z).ToList().ToArray());
-		List<Vector2> convexHull = GrahamScan.ConvexHull(new List<Vector3>(verts));
-        //convexHull.ForEach(c => Debug.Log("CONVEX HULL: "+c));
-		//CreateMesh(SimplifiedPointsTo3D(convexHull));
-
-		//Debug.Log("mientras que con el convexHull tendría " + convexHull.Count);
-
-		//i = 0;
-		//foreach (Vector2 vert in convexHull)
-		//{
-		//	i++;
-		//	Debug.Log("GRAHAM " + i + " ->" + vert);
-
-		//}
-		//      for (int z = 0; z < SimplifiedPointsTo3D(convexHull).Length; z++)
-		//      {
-		//          Debug.Log("GRAHAM3D " + z + " ->" + SimplifiedPointsTo3D(convexHull)[z]);
-		//      }
-
-	}
-    public List<(Vector3, Vector3)> ConnectVertices(List<Vector3> vertices)
-    {
-        List<(Vector3, Vector3)> segments = new List<(Vector3, Vector3)>();
-
-        for (int i = 0; i < vertices.Count - 1; i++)
+        // Recorremos la lista de objetos
+        for (int i = 0; i < meshFiltersList.Count; i++)
         {
-            Vector3 start = vertices[i];
-            Vector3 end = vertices[i + 1];
+            // Creamos un CombineInstance y le asignamos el mesh del objeto actual
+            CombineInstance combineInstance = new CombineInstance();
+            combineInstance.mesh = meshFiltersList[i].mesh;
 
-            // Comprobar si los dos puntos están en la misma fila o columna
-            if (start.x == end.x || start.z == end.z)
-            {
-                // Comprobar si hay obstáculos intermedios
-                Vector3 direction = (end - start).normalized;
-                float distance = Vector3.Distance(start, end);
-                bool hasObstacle = false;
+            // Transformamos los vértices del mesh según la transformación del objeto
+            combineInstance.transform = meshFiltersList[i].transform.localToWorldMatrix;
 
-                for (float d = 0f; d < distance; d += 0.1f)
-                {
-                    Vector3 point = start + direction * d;
-                    int x = Mathf.RoundToInt(point.x);
-                    int z = Mathf.RoundToInt(point.z);
-
-                    if (CombateManager.instance.GetPathfinding().GetRealNode(x, z) != null)
-					{
-                        if (!CombateManager.instance.GetPathfinding().GetRealNode(x, z).isWalkable)
-                        {
-                            hasObstacle = true;
-                            break;
-                        }
-                    }
-                   
-                }
-
-                if (!hasObstacle)
-                {
-                    segments.Add((start, end));
-                }
-            }
+            // Añadimos el CombineInstance al array
+            combineInstances[i] = combineInstance;
         }
 
-        return segments;
+        // Creamos un nuevo objeto para almacenar el mesh combinado
+        GameObject combinedObject = new GameObject("Combined Mesh");
+
+        // Añadimos un componente MeshFilter al objeto
+        MeshFilter meshFilter = combinedObject.AddComponent<MeshFilter>();
+
+        // Combinamos los meshes en un solo mesh
+        Mesh combinedMesh = new Mesh();
+        combinedMesh.CombineMeshes(combineInstances, true, true);
+
+        // Asignamos el mesh combinado al MeshFilter
+        meshFilter.mesh = combinedMesh;
+
+        // Añadimos un componente MeshRenderer al objeto
+        meshRenderer = combinedObject.AddComponent<MeshRenderer>();
+        meshRenderer.material = new Material(Shader.Find("Standard"));
     }
 
+	public void CreateSelectableNodesMesh(Vector3[] verts, Material material)
+	{
+        //CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
+        CombineMeshList(CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList());
+
+  //      Debug.Log("tengo " + verts.Length + " puntos");
+  //      //Debug.Log()
+  //      //      int i = 0;
+  //      //      foreach(Vector3 vert in verts)
+  //      //{
+  //      //          i++;
+  //      //          Debug.Log("NORMAL " + i + " ->" + vert);
+  //      //      }
+  //      //verts = SimplifiedPointsTo3D(SortPointsByAngle(GetSimplifiedPoints(verts), new Vector2(CalculateCenter(verts).x, CalculateCenter(verts).z)));
+  //      //i = 0;
+  //      //foreach (Vector3 vert in verts)
+  //      //{
+  //      //    i++;
+  //      //    Debug.Log("ORDENADO "+i+" ->" + vert);
+
+        //      //}
+        //      List<Vector3> lista = new List<Vector3>(verts);
+        ////CreateMesh(lista.OrderBy(p => p.x).ThenBy(p => p.z).ToList().ToArray());
+        //List<Vector2> convexHull = GrahamScan.ConvexHull(new List<Vector3>(verts));
+        ////convexHull.ForEach(c => Debug.Log("CONVEX HULL: "+c));
+        //CreateMesh(SimplifiedPointsTo3D(convexHull));
+
+        ////Debug.Log("mientras que con el convexHull tendría " + convexHull.Count);
+
+        ////i = 0;
+        ////foreach (Vector2 vert in convexHull)
+        ////{
+        ////	i++;
+        ////	Debug.Log("GRAHAM " + i + " ->" + vert);
+
+        ////}
+        ////      for (int z = 0; z < SimplifiedPointsTo3D(convexHull).Length; z++)
+        ////      {
+        ////          Debug.Log("GRAHAM3D " + z + " ->" + SimplifiedPointsTo3D(convexHull)[z]);
+        ////      }
+
+    }
 
     void CreateMesh(Vector3[] convexHull)
     {
@@ -229,4 +224,63 @@ public class PathRenderer : MonoBehaviour
         
         return points3D.ToArray();
 	}
+
+    public List<Vector3> UnifySegments(List<Vector3> vertices, HashSet<Tuple<Vector3, Vector3>> unitedSegments)
+    {
+        if (vertices.Count == 1) return vertices;
+
+        var newVertices = new List<Vector3>();
+        for (int i = 0; i < vertices.Count; i++)
+        {
+            var v1 = vertices[i];
+            for (int j = i + 1; j < vertices.Count; j++)
+            {
+                var v2 = vertices[j];
+                var segment = new Tuple<Vector3, Vector3>(v1, v2);
+                if (!unitedSegments.Contains(segment))
+                {
+                    var canUnify = true;
+                    foreach (var otherSegment in unitedSegments)
+                    {
+                        if (AreSegmentsAdjacent(segment, otherSegment))
+                        {
+                            var commonVertex = GetCommonVertex(segment, otherSegment);
+                            if (commonVertex != null && !vertices.Contains(commonVertex.Value))
+                            {
+                                canUnify = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (canUnify)
+                    {
+                        unitedSegments.Add(segment);
+                        newVertices.Add(v1);
+                        newVertices.Add(v2);
+                    }
+                }
+            }
+        }
+
+        if (newVertices.Count > 0)
+        {
+            newVertices = UnifySegments(newVertices, unitedSegments);
+        }
+
+        return newVertices;
+    }
+
+    public bool AreSegmentsAdjacent(Tuple<Vector3, Vector3> segment1, Tuple<Vector3, Vector3> segment2)
+    {
+        return segment1.Item1 == segment2.Item1 || segment1.Item1 == segment2.Item2 ||
+               segment1.Item2 == segment2.Item1 || segment1.Item2 == segment2.Item2;
+    }
+
+    public Vector3? GetCommonVertex(Tuple<Vector3, Vector3> segment1, Tuple<Vector3, Vector3> segment2)
+    {
+        if (segment1.Item1 == segment2.Item1 || segment1.Item1 == segment2.Item2) return segment1.Item1;
+        if (segment1.Item2 == segment2.Item1 || segment1.Item2 == segment2.Item2) return segment1.Item2;
+        return null;
+    }
 }

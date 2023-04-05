@@ -98,6 +98,29 @@ public class Pathfinding
 		return selectableNodes;
 	}
 
+	public List<MeshFilter> GetSelectableNodesMeshesList()
+	{
+		List<MeshFilter> meshFilterList = new List<MeshFilter>();
+		foreach (PathNode pathNode in selectableNodes)
+		{
+			meshFilterList.Add(GetPathNodeMesh(pathNode));
+		}
+		return meshFilterList;
+	}
+
+	MeshFilter GetPathNodeMesh(PathNode pathNode)
+	{
+		Vector3 offset = new Vector3(grid.GetCellSize() / 2, 0 , grid.GetCellSize() / 2);
+		Vector3 nodeWorldPôsition = new Vector3(pathNode.worldX, 1, pathNode.worldZ) + offset; 
+		MeshFilter meshFilter = null;
+		RaycastHit hit;
+		if (Physics.Raycast(nodeWorldPôsition, Vector3.down, out hit, 1, LayerMask.GetMask("pathNode")))
+		{
+			meshFilter = hit.transform.gameObject.GetComponent<MeshFilter>();
+		}
+		return meshFilter;
+	}
+
 	public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 endWorldPosition)
 	{
 		grid.GetXZ(startWorldPosition, out int startX, out int startZ);
@@ -395,7 +418,6 @@ public class Pathfinding
 		{
 			//if (pathNode.neighbours.Count == 7 || pathNode.neighbours.Count == 3 || pathNode.neighbours.Count == 0)
 			//{
-				Debug.Log("Hola de nuevo, soy el nodo: " + pathNode.ToString() + " y tengo " + pathNode.neighbours.Count + " vecinos");
 				float offsetY = 0.35f;
 				Vector3 vert1 = new Vector3(pathNode.worldX, offsetY, pathNode.worldZ);
 				Vector3 vert2 = new Vector3(pathNode.worldX + grid.GetCellSize(), offsetY, pathNode.worldZ);
