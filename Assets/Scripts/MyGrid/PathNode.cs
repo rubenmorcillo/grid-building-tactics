@@ -28,7 +28,7 @@ public class PathNode
 
 	//La sugerencia de chatGPT para precargar los vecinos
 	//public PathNode[] Neighbours { get; private set; }
-
+	public List<PathNode> neighbours = new List<PathNode>();
 
 	public PathNode(GridXZ<PathNode> grid, int x, int z)
 	{

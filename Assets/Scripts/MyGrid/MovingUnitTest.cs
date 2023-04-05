@@ -5,7 +5,7 @@ using UnityEngine;
 public class MovingUnitTest : MonoBehaviour
 {
 
-    private const float speed = 40f;
+    private const float speed = 10f;
 
     private int currentPathIndex;
     private List<Vector3> pathVectorList;
@@ -64,10 +64,10 @@ public class MovingUnitTest : MonoBehaviour
         currentPathIndex = 0;
         pathVectorList = Pathfinding.Instance.FindPath(GetPosition(), targetPosition);
 
-        if (pathVectorList != null && pathVectorList.Count > 1)
+		if (pathVectorList != null && pathVectorList.Count > 1)
 		{
-            pathVectorList.RemoveAt(0);
+			pathVectorList.RemoveAt(0);
 
-        }
+		}
 	}
 }
