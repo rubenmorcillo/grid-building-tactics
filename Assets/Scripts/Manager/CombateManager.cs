@@ -59,14 +59,14 @@ public class CombateManager : MonoBehaviour
 
     void FixedUpdate()
     {
-      
+
+
         pathfinding.FindSelectableNodes();
         //pathRenderer.CreateSelectableNodesMesh(pathfinding.GetSelectableNodesVerts(), meshMaterial);
         //pathRenderer.DrawShape(pathfinding.GetSelectableNodesVertsInWorld());
-        
+
         pathfinding.DebugDrawSelectables();
-
-
+        pathRenderer.CreateSelectableNodesMesh(pathfinding.GetSelectableNodesVertsInWorld(), meshMaterial);
         turnManager?.Update();
 
         ControlarClick();
@@ -98,7 +98,7 @@ public class CombateManager : MonoBehaviour
         }
         if (Input.GetMouseButton(0))
         {
-            pathRenderer.CreateSelectableNodesMesh(pathfinding.GetSelectableNodesVertsInWorld(), meshMaterial);
+           
 
             if (pathfinding.GetGrid().GetGridObject(x, z).selectable)
 			{

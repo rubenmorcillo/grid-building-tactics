@@ -15,6 +15,8 @@ public class PathRenderer : MonoBehaviour
 
     //private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
+    private GameObject combinedMeshObject;
+
 
 
     private void Start()
@@ -71,22 +73,32 @@ public class PathRenderer : MonoBehaviour
         // Recorremos la lista de objetos
         for (int i = 0; i < meshFiltersList.Count; i++)
         {
+            //Debug.Log("Soy el mesh de " + meshFiltersList[i].gameObject);
             // Creamos un CombineInstance y le asignamos el mesh del objeto actual
             CombineInstance combineInstance = new CombineInstance();
-            combineInstance.mesh = meshFiltersList[i].mesh;
+            if (meshFiltersList[i] != null)
+			{
+                combineInstance.mesh = meshFiltersList[i].mesh;
+                combineInstance.transform = meshFiltersList[i].transform.localToWorldMatrix;
+
+            }
 
             // Transformamos los vértices del mesh según la transformación del objeto
-            combineInstance.transform = meshFiltersList[i].transform.localToWorldMatrix;
 
             // Añadimos el CombineInstance al array
             combineInstances[i] = combineInstance;
         }
 
+        //si ya existe lo destruímos
+        if (combinedMeshObject != null)
+		{
+            Destroy(combinedMeshObject);
+		}
         // Creamos un nuevo objeto para almacenar el mesh combinado
-        GameObject combinedObject = new GameObject("Combined Mesh");
+        combinedMeshObject = new GameObject("Combined Mesh");
 
         // Añadimos un componente MeshFilter al objeto
-        MeshFilter meshFilter = combinedObject.AddComponent<MeshFilter>();
+        MeshFilter meshFilter = combinedMeshObject.AddComponent<MeshFilter>();
 
         // Combinamos los meshes en un solo mesh
         Mesh combinedMesh = new Mesh();
@@ -96,29 +108,33 @@ public class PathRenderer : MonoBehaviour
         meshFilter.mesh = combinedMesh;
 
         // Añadimos un componente MeshRenderer al objeto
-        meshRenderer = combinedObject.AddComponent<MeshRenderer>();
+        meshRenderer = combinedMeshObject.AddComponent<MeshRenderer>();
         meshRenderer.material = new Material(Shader.Find("Standard"));
     }
 
 	public void CreateSelectableNodesMesh(Vector3[] verts, Material material)
 	{
-        //CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
-        CombineMeshList(CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList());
+		//CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
+		List<MeshFilter> meshesList = CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
+        if (meshesList != null && meshesList.Count > 0)
+		{
+            CombineMeshList(meshesList);
+        }
 
-  //      Debug.Log("tengo " + verts.Length + " puntos");
-  //      //Debug.Log()
-  //      //      int i = 0;
-  //      //      foreach(Vector3 vert in verts)
-  //      //{
-  //      //          i++;
-  //      //          Debug.Log("NORMAL " + i + " ->" + vert);
-  //      //      }
-  //      //verts = SimplifiedPointsTo3D(SortPointsByAngle(GetSimplifiedPoints(verts), new Vector2(CalculateCenter(verts).x, CalculateCenter(verts).z)));
-  //      //i = 0;
-  //      //foreach (Vector3 vert in verts)
-  //      //{
-  //      //    i++;
-  //      //    Debug.Log("ORDENADO "+i+" ->" + vert);
+        //      Debug.Log("tengo " + verts.Length + " puntos");
+        //      //Debug.Log()
+        //      //      int i = 0;
+        //      //      foreach(Vector3 vert in verts)
+        //      //{
+        //      //          i++;
+        //      //          Debug.Log("NORMAL " + i + " ->" + vert);
+        //      //      }
+        //      //verts = SimplifiedPointsTo3D(SortPointsByAngle(GetSimplifiedPoints(verts), new Vector2(CalculateCenter(verts).x, CalculateCenter(verts).z)));
+        //      //i = 0;
+        //      //foreach (Vector3 vert in verts)
+        //      //{
+        //      //    i++;
+        //      //    Debug.Log("ORDENADO "+i+" ->" + vert);
 
         //      //}
         //      List<Vector3> lista = new List<Vector3>(verts);
