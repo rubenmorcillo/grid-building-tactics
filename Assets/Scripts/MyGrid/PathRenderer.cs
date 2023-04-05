@@ -16,6 +16,9 @@ public class PathRenderer : MonoBehaviour
     //private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
     private GameObject combinedMeshObject;
+    public Shader selectableMeshShader;
+    public Material selectableMeshMaterial;
+
 
 
 
@@ -112,8 +115,9 @@ public class PathRenderer : MonoBehaviour
         meshRenderer.material = new Material(Shader.Find("Standard"));
     }
 
-	public void CreateSelectableNodesMesh(Vector3[] verts, Material material)
+	public void CreateSelectableNodesMesh()
 	{
+        Debug.Log("creando el mesh");
 		//CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
 		List<MeshFilter> meshesList = CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
         if (meshesList != null && meshesList.Count > 0)
@@ -190,7 +194,9 @@ public class PathRenderer : MonoBehaviour
 
         // Configuramos el material del MeshRenderer
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
-        meshRenderer.material = new Material(Shader.Find("Standard"));
+       
+        meshRenderer.material = new Material(selectableMeshShader);
+        //meshRenderer.material = new Material(selectableMeshMaterial);
     }
 
 

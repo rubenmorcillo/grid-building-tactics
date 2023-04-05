@@ -61,18 +61,12 @@ public class CombateManager : MonoBehaviour
     {
 
 
-        pathfinding.FindSelectableNodes();
-        //pathRenderer.CreateSelectableNodesMesh(pathfinding.GetSelectableNodesVerts(), meshMaterial);
-        //pathRenderer.DrawShape(pathfinding.GetSelectableNodesVertsInWorld());
-
-        pathfinding.DebugDrawSelectables();
-        pathRenderer.CreateSelectableNodesMesh(pathfinding.GetSelectableNodesVertsInWorld(), meshMaterial);
+        //pathfinding.FindSelectableNodes();
+        //pathfinding.DebugDrawSelectables();
+        //pathRenderer.CreateSelectableNodesMesh();
         turnManager?.Update();
 
         ControlarClick();
-
-
-
 
     }
 
@@ -111,6 +105,11 @@ public class CombateManager : MonoBehaviour
     public Pathfinding GetPathfinding()
 	{
         return pathfinding;
+	}
+
+    public PathRenderer GetPathRenderer()
+	{
+        return pathRenderer;
 	}
     public void SetCurrentUnity(TacticUnity currentUnity)
 	{
