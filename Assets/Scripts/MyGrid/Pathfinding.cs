@@ -355,12 +355,7 @@ public class Pathfinding
 		Vector3 center = new Vector3(originNode.worldX + grid.GetCellSize() / 2, 0, originNode.worldZ + grid.GetCellSize() / 2);
 		if (Physics.Raycast(center + correccionAltura, direction, out hiteo, grid.GetCellSize(), LayerMask.GetMask("Wall")))
 		{
-			//Debug.Log("soy " + originNode.ToString() + " y me estoy chocando con " + hiteo.transform.gameObject.name); ;
-			//if (hiteo.collider.CompareTag("Muro"))
-			//{
-				wall = true;
-				//CheckRelativeCoverages(hiteo.collider.gameObject);
-			//}
+			wall = true;
 
 		}
 
@@ -413,78 +408,6 @@ public class Pathfinding
 		 
 	}
 
-	public Vector3[] GetSelectableNodesVertsInWorld()
-	{
-		List<Vector3> verts = new List<Vector3>();
-		foreach (PathNode pathNode in selectableNodes)
-		{
-			//if (pathNode.neighbours.Count == 7 || pathNode.neighbours.Count == 3 || pathNode.neighbours.Count == 0)
-			//{
-				float offsetY = 0.35f;
-				Vector3 vert1 = new Vector3(pathNode.worldX, offsetY, pathNode.worldZ);
-				Vector3 vert2 = new Vector3(pathNode.worldX + grid.GetCellSize(), offsetY, pathNode.worldZ);
-				Vector3 vert3 = new Vector3(pathNode.worldX, offsetY, pathNode.worldZ + grid.GetCellSize());
-				Vector3 vert4 = new Vector3(pathNode.worldX + grid.GetCellSize(), offsetY, pathNode.worldZ + grid.GetCellSize());
-				if (!verts.Contains(vert1)) verts.Add(vert1);
-				if (!verts.Contains(vert2)) verts.Add(vert2);
-				if (!verts.Contains(vert3)) verts.Add(vert3);
-				if (!verts.Contains(vert4)) verts.Add(vert4);
-			//}
-			
-		}
-		
-		return verts.ToArray();
-
-		//List<Vector3> verts = new List<Vector3>();
-		//for (int i = 0; i < selectableNodes.Count - 1; i++)
-		//{
-		//	for (int j = i + 1; j < selectableNodes.Count; j++)
-		//	{
-		//		//Debug.Log("comprobando " + selectableNodes[i] +" que tiene nosecuantos -> "+selectableNodes[i].neighbours.Count +" vecinosss");
-		//		//if (selectableNodes[i].neighbours.Count <= 3)
-		//		//{
-		//		//	Debug.Log("exito con el " + selectableNodes[i].ToString());
-		//		//}
-		//		if (AreAdjacent(selectableNodes[i], selectableNodes[j]))
-		//		{
-		//			List<PathNode> realNeighbours = new List<PathNode>();
-		//			foreach (PathNode node in selectableNodes[i].neighbours)
-		//			{
-		//				if (node.selectable)
-		//				{
-		//					realNeighbours.Add(node);
-		//				}
-		//			}
-
-		//			if (realNeighbours.Count != 0)
-		//			{
-		//				//Debug.Log("YIHAAA SOY: " + selectableNodes[i] + " y debo ser una esquina porque mis vecinos reales son " + realNeighbours.Count);
-		//				for (int k = 0; k < realNeighbours.Count; k++)
-		//				{
-		//					//Debug.Log("vecino: " + realNeighbours[k].ToString());
-
-		//				}
-		//			}
-		//			float offsetY = 0.35f;
-		//			Vector3 vert1 = new Vector3(selectableNodes[i].worldX, offsetY, selectableNodes[i].worldZ);
-		//			Vector3 vert2 = new Vector3(selectableNodes[i].worldX + grid.GetCellSize(), offsetY, selectableNodes[i].worldZ);
-		//			Vector3 vert3 = new Vector3(selectableNodes[i].worldX, offsetY, selectableNodes[i].worldZ + grid.GetCellSize());
-		//			Vector3 vert4 = new Vector3(selectableNodes[j].worldX + grid.GetCellSize(), offsetY, selectableNodes[j].worldZ + grid.GetCellSize());
-		//			Vector3 vert5 = new Vector3(selectableNodes[j].worldX, offsetY, selectableNodes[j].worldZ + grid.GetCellSize());
-		//			Vector3 vert6 = new Vector3(selectableNodes[j].worldX + grid.GetCellSize(), offsetY, selectableNodes[j].worldZ);
-
-		//			if (!verts.Contains(vert1)) verts.Add(vert1);
-		//			if (!verts.Contains(vert2)) verts.Add(vert2);
-		//			if (!verts.Contains(vert3)) verts.Add(vert3);
-		//			if (!verts.Contains(vert4)) verts.Add(vert4);
-		//			if (!verts.Contains(vert5)) verts.Add(vert5);
-		//			if (!verts.Contains(vert6)) verts.Add(vert6);
-		//		}
-		//	}
-		//}
-		//return verts.ToArray();
-	}
-
 	public List<PathNode> GetExteriorSelectableNodes()
 	{
 		foreach (PathNode node in selectableNodes)
@@ -506,7 +429,6 @@ public class Pathfinding
 	void CheckNeighbour(PathNode pathNode, Directions.Cardinal cardinal)
 	{
 		Vector3 pathNodePosition = new Vector3(pathNode.x, 0, pathNode.z);
-
 		Vector3 neighbourNodePosition = pathNodePosition + Directions.GetVectorFromCardinal(cardinal);
 		PathNode neighbour = GetNode(Mathf.FloorToInt(neighbourNodePosition.x), Mathf.FloorToInt( neighbourNodePosition.z));
 		if (neighbour == null || !neighbour.selectable)
@@ -518,7 +440,6 @@ public class Pathfinding
 				exteriorSelectableNodes.Add(pathNode);
 			}
 		}
-
 	}
 	
 	void ClearSelectableNodes()
