@@ -31,7 +31,7 @@ public class CombateManager : MonoBehaviour
     [SerializeField] TacticUnity currentUnity;
     [SerializeField] TurnManager turnManager;
     [SerializeField] PathRenderer pathRenderer;
-    [SerializeField] Material meshMaterial;
+    [SerializeField] public Material meshMaterial;
 
 
     void Start()

@@ -11,6 +11,7 @@ public class Pathfinding
 	private List<PathNode> pathNodeList = new List<PathNode>();
 
 	private List<PathNode> selectableNodes = new List<PathNode>();
+	List<PathNode> exteriorSelectableNodes = new List<PathNode>();
 	private List<PathNode> openList;
 	private List<PathNode> closedList;
 
@@ -100,6 +101,7 @@ public class Pathfinding
 
 	public List<MeshFilter> GetSelectableNodesMeshesList()
 	{
+		Debug.Log("Actualmente tenemos "+selectableNodes.Count+" casillas seleccionables");
 		List<MeshFilter> meshFilterList = new List<MeshFilter>();
 		foreach (PathNode pathNode in selectableNodes)
 		{
@@ -483,13 +485,41 @@ public class Pathfinding
 		//return verts.ToArray();
 	}
 
-	bool AreAdjacent(PathNode node1, PathNode node2)
+	public List<PathNode> GetExteriorSelectableNodes()
 	{
-		int dx = Mathf.Abs(node1.x - node2.x);
-		int dz = Mathf.Abs(node1.z - node2.z);
-		return (dx == 1 * grid.GetCellSize() && dz == 0) || (dx == 0 && dz == 1 * grid.GetCellSize());
+		foreach (PathNode node in selectableNodes)
+		{
+			UpdateExteriores(node);
+		}
+		return exteriorSelectableNodes;
 	}
 
+	void UpdateExteriores(PathNode pathNode)
+	{
+		//Debug.Log("Soy el nodo" + GetNode(pathNode.x, pathNode.z ) + " Actualizando mis exteriores");
+		CheckNeighbour(pathNode, Directions.Cardinal.ESTE);
+		CheckNeighbour(pathNode, Directions.Cardinal.OESTE);
+		CheckNeighbour(pathNode, Directions.Cardinal.NORTE);
+		CheckNeighbour(pathNode, Directions.Cardinal.SUR);
+	}
+
+	void CheckNeighbour(PathNode pathNode, Directions.Cardinal cardinal)
+	{
+		Vector3 pathNodePosition = new Vector3(pathNode.x, 0, pathNode.z);
+
+		Vector3 neighbourNodePosition = pathNodePosition + Directions.GetVectorFromCardinal(cardinal);
+		PathNode neighbour = GetNode(Mathf.FloorToInt(neighbourNodePosition.x), Mathf.FloorToInt( neighbourNodePosition.z));
+		if (neighbour == null || !neighbour.selectable)
+		{
+			//Debug.Log("tengo exterior al " + cardinal);
+			pathNode.exterior.Add(cardinal);
+			if (!exteriorSelectableNodes.Contains(pathNode))
+			{
+				exteriorSelectableNodes.Add(pathNode);
+			}
+		}
+
+	}
 	
 	void ClearSelectableNodes()
 	{

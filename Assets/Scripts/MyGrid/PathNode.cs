@@ -16,6 +16,7 @@ public class PathNode
 	public int fCost;
 	public bool visited;
 
+
 	public bool isWalkable;
 	public bool current = false;
 	public bool selectable = false;
@@ -29,6 +30,9 @@ public class PathNode
 	//La sugerencia de chatGPT para precargar los vecinos
 	//public PathNode[] Neighbours { get; private set; }
 	public List<PathNode> neighbours = new List<PathNode>();
+
+	public List<Directions.Cardinal> exterior = new List<Directions.Cardinal>();
+
 
 	public PathNode(GridXZ<PathNode> grid, int x, int z)
 	{
@@ -68,6 +72,7 @@ public class PathNode
 	{
 		//coveragesDirections.Clear();
 		//coveragesValidDirections.Clear();
+		exterior.Clear();
 		current = false;
 		target = false;
 		selectable = false;

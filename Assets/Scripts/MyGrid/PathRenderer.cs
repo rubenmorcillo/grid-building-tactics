@@ -1,9 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Experimental.Rendering.Universal;
-using Unity.Collections;
 using System.Linq;
 using System;
 
@@ -17,11 +13,6 @@ public class PathRenderer : MonoBehaviour
     private MeshRenderer meshRenderer;
     private GameObject combinedMeshObject;
     public Shader selectableMeshShader;
-    public Material selectableMeshMaterial;
-
-
-
-
     private void Start()
     {
         // Agrega un Line Renderer al objeto
@@ -107,16 +98,35 @@ public class PathRenderer : MonoBehaviour
         Mesh combinedMesh = new Mesh();
         combinedMesh.CombineMeshes(combineInstances, true, true);
 
-        // Asignamos el mesh combinado al MeshFilter
-        meshFilter.mesh = combinedMesh;
+
+
+
+        List<Vector3> verticesExteriores = SimplifiedPointsTo3D(SortPoints(GetSimplifiedPoints(GetDistinctPoints(combinedMesh).ToArray()).ToList())).ToList();
+        
+        //Debug.Log("se supone que tenemos "+ verticesExteriores.Distinct().ToList().Count+" vertices externos");
+        //verticesExteriores.Distinct().ToList().ForEach(f => Debug.Log("soy el punto " + f));
+        
+
+
+
+		// Asignamos el mesh combinado al MeshFilter
+		meshFilter.mesh = combinedMesh;
 
         // Añadimos un componente MeshRenderer al objeto
         meshRenderer = combinedMeshObject.AddComponent<MeshRenderer>();
-        meshRenderer.material = new Material(Shader.Find("Standard"));
+
+        //Load a Texture (Assets/Resources/Textures/texture01.png)
+        Material material  = Resources.Load<Material>("Materials/OutlineMaterial");
+        meshRenderer.material = material;
+
     }
 
-	public void CreateSelectableNodesMesh()
+
+    public void CreateSelectableNodesMesh()
 	{
+		List<PathNode> exteriorNodes = CombateManager.instance.GetPathfinding().GetExteriorSelectableNodes();
+        exteriorNodes.ForEach(f => Debug.Log("soy el nodo exterior " + f));
+
         Debug.Log("creando el mesh");
 		//CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
 		List<MeshFilter> meshesList = CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
@@ -124,83 +134,55 @@ public class PathRenderer : MonoBehaviour
 		{
             CombineMeshList(meshesList);
         }
-
-        //      Debug.Log("tengo " + verts.Length + " puntos");
-        //      //Debug.Log()
-        //      //      int i = 0;
-        //      //      foreach(Vector3 vert in verts)
-        //      //{
-        //      //          i++;
-        //      //          Debug.Log("NORMAL " + i + " ->" + vert);
-        //      //      }
-        //      //verts = SimplifiedPointsTo3D(SortPointsByAngle(GetSimplifiedPoints(verts), new Vector2(CalculateCenter(verts).x, CalculateCenter(verts).z)));
-        //      //i = 0;
-        //      //foreach (Vector3 vert in verts)
-        //      //{
-        //      //    i++;
-        //      //    Debug.Log("ORDENADO "+i+" ->" + vert);
-
-        //      //}
-        //      List<Vector3> lista = new List<Vector3>(verts);
-        ////CreateMesh(lista.OrderBy(p => p.x).ThenBy(p => p.z).ToList().ToArray());
-        //List<Vector2> convexHull = GrahamScan.ConvexHull(new List<Vector3>(verts));
-        ////convexHull.ForEach(c => Debug.Log("CONVEX HULL: "+c));
-        //CreateMesh(SimplifiedPointsTo3D(convexHull));
-
-        ////Debug.Log("mientras que con el convexHull tendría " + convexHull.Count);
-
-        ////i = 0;
-        ////foreach (Vector2 vert in convexHull)
-        ////{
-        ////	i++;
-        ////	Debug.Log("GRAHAM " + i + " ->" + vert);
-
-        ////}
-        ////      for (int z = 0; z < SimplifiedPointsTo3D(convexHull).Length; z++)
-        ////      {
-        ////          Debug.Log("GRAHAM3D " + z + " ->" + SimplifiedPointsTo3D(convexHull)[z]);
-        ////      }
-
     }
 
-    void CreateMesh(Vector3[] convexHull)
+
+    //FUNCIÓN PARA DEBUG
+    //void CreateCubes(List<Vector3> positions)
+    //{
+    //    foreach (Vector3 pos in positions)
+    //    {
+    //        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+    //        cube.transform.position = pos;
+    //    }
+    //}
+
+    List<Vector2> SortPoints(List<Vector2> points)
     {
-        // Creamos un nuevo Mesh
-        Mesh mesh = new Mesh();
-
-        // Añadimos los vertices
-        mesh.vertices = convexHull;
-
-        // Definimos los triangulos a partir de los vertices
-        int[] triangles = new int[(convexHull.Length - 2) * 3];
-        int count = 0;
-        for (int i = 2; i < convexHull.Length; i++)
+        List<Vector2> sortedPoints = new List<Vector2>(points);
+        sortedPoints.Sort((a, b) =>
         {
-            triangles[count++] = 0;
-            triangles[count++] = i - 1;
-            triangles[count++] = i;
-        }
-
-        // Asignamos los triangulos al Mesh
-        mesh.triangles = triangles;
-
-        // Recalculamos las normales y tangentes
-        mesh.RecalculateNormals();
-        mesh.RecalculateTangents();
-
-        // Asignamos el Mesh al componente MeshFilter
-        MeshFilter meshFilter = GetComponent<MeshFilter>();
-        meshFilter.mesh = mesh;
-
-        // Configuramos el material del MeshRenderer
-        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
-       
-        meshRenderer.material = new Material(selectableMeshShader);
-        //meshRenderer.material = new Material(selectableMeshMaterial);
+            int compareX = a.x.CompareTo(b.x);
+            if (compareX != 0)
+            {
+                return compareX;
+            }
+            else
+            {
+                return a.y.CompareTo(b.y);
+            }
+        });
+        return sortedPoints;
     }
+    List<Vector3> GetDistinctPoints(Mesh mesh) {
+        List<Vector3> allPoints = new List<Vector3>(mesh.vertices);
+        List<Vector3> distinctPoints = new List<Vector3>();
 
-
-
+        for (int i = 0; i < allPoints.Count; i++) {
+            bool alreadyExists = false;
+            for (int j = 0; j < i; j++) {
+                if (allPoints[i] == allPoints[j]) {
+                    alreadyExists = true;
+                    break;
+                }
+            }
+            if (!alreadyExists) {
+                distinctPoints.Add(allPoints[i]);
+            }
+        }
+        return distinctPoints;
+    }
+    
     // Ordena los puntos por ángulo respecto al punto pivot
     private static List<Vector2> SortPointsByAngle(List<Vector2> points, Vector2 pivot)
     {
@@ -247,62 +229,6 @@ public class PathRenderer : MonoBehaviour
         return points3D.ToArray();
 	}
 
-    public List<Vector3> UnifySegments(List<Vector3> vertices, HashSet<Tuple<Vector3, Vector3>> unitedSegments)
-    {
-        if (vertices.Count == 1) return vertices;
+    
 
-        var newVertices = new List<Vector3>();
-        for (int i = 0; i < vertices.Count; i++)
-        {
-            var v1 = vertices[i];
-            for (int j = i + 1; j < vertices.Count; j++)
-            {
-                var v2 = vertices[j];
-                var segment = new Tuple<Vector3, Vector3>(v1, v2);
-                if (!unitedSegments.Contains(segment))
-                {
-                    var canUnify = true;
-                    foreach (var otherSegment in unitedSegments)
-                    {
-                        if (AreSegmentsAdjacent(segment, otherSegment))
-                        {
-                            var commonVertex = GetCommonVertex(segment, otherSegment);
-                            if (commonVertex != null && !vertices.Contains(commonVertex.Value))
-                            {
-                                canUnify = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (canUnify)
-                    {
-                        unitedSegments.Add(segment);
-                        newVertices.Add(v1);
-                        newVertices.Add(v2);
-                    }
-                }
-            }
-        }
-
-        if (newVertices.Count > 0)
-        {
-            newVertices = UnifySegments(newVertices, unitedSegments);
-        }
-
-        return newVertices;
-    }
-
-    public bool AreSegmentsAdjacent(Tuple<Vector3, Vector3> segment1, Tuple<Vector3, Vector3> segment2)
-    {
-        return segment1.Item1 == segment2.Item1 || segment1.Item1 == segment2.Item2 ||
-               segment1.Item2 == segment2.Item1 || segment1.Item2 == segment2.Item2;
-    }
-
-    public Vector3? GetCommonVertex(Tuple<Vector3, Vector3> segment1, Tuple<Vector3, Vector3> segment2)
-    {
-        if (segment1.Item1 == segment2.Item1 || segment1.Item1 == segment2.Item2) return segment1.Item1;
-        if (segment1.Item2 == segment2.Item1 || segment1.Item2 == segment2.Item2) return segment1.Item2;
-        return null;
-    }
 }
