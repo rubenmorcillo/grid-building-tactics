@@ -83,7 +83,6 @@ public class PathRenderer : MonoBehaviour
         Mesh combinedMesh = new Mesh();
         combinedMesh.CombineMeshes(combineInstances, true, true);
 
-
 		// Asignamos el mesh combinado al MeshFilter
 		meshFilter.mesh = combinedMesh;
 
@@ -103,11 +102,12 @@ public class PathRenderer : MonoBehaviour
         if (exteriorNodes.Count > 0)
 		{
             //CreateCubes(GetExteriorPoints(exteriorNodes).Distinct().ToList());
-            DrawPath(EdgesToPointList(SortEdges(GetExteriorEdges(exteriorNodes).Distinct().ToList())).ToArray());
+            //CREAR LOS BORDES CON LA LINEA -> NO ESTÁ FUNCIONANDO CORRECTAMENTE POR LOS SEGMENTOS
+           // DrawPath(EdgesToPointList(SortEdges(GetExteriorEdges(exteriorNodes).Distinct().ToList())).ToArray());
 			Debug.Log("creando el mesh");
 			//List<MeshFilter> meshesList = CombateManager.instance.GetPathfinding().GetExteriorSelectableNodesMeshesList();
 			List<MeshFilter> meshesList = CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
-            if (meshesList != null && meshesList.Count > 0)
+			if (meshesList != null && meshesList.Count > 0)
             {
                 CombineMeshList(meshesList);
             }

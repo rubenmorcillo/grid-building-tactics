@@ -51,8 +51,8 @@ public class TurnManager
 
 
 			//CombateManager.instance.GetPathfinding().DebugDrawSelectables();
-			CombateManager.instance.GetPathfinding().FindSelectableNodes();
-			CombateManager.instance.GetPathRenderer().CreateSelectableNodesMesh();
+			//CombateManager.instance.GetPathfinding().FindSelectableNodes();
+			//CombateManager.instance.GetPathRenderer().CreateSelectableNodesMesh();
 			CombateManager.instance.SetCurrentUnity(unidad);
 		}
 	}

@@ -423,7 +423,6 @@ public class Pathfinding
 		{
 			UpdateExteriores(node);
 		}
-		Debug.Log("devolviendo "+selectableNodes.Count+" selectable EXTERIOR nodes");
 		return exteriorSelectableNodes;
 	}
 
@@ -463,6 +462,7 @@ public class Pathfinding
 			}
 		}
 		selectableNodes.Clear();
+		exteriorSelectableNodes.Clear();
 	}
 
 	public void FindSelectableNodes()
