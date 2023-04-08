@@ -48,11 +48,10 @@ public class TurnManager
 			TacticUnity unidad = unidadesTurno.Peek();
 			Debug.Log("empezando turno de "+unidad.name);
 			unidad.BeginTurn();
-			CombateManager.instance.GetPathfinding().FindSelectableNodes();
-			//pathRenderer.CreateSelectableNodesMesh(pathfinding.GetSelectableNodesVerts(), meshMaterial);
-			//pathRenderer.DrawShape(pathfinding.GetSelectableNodesVertsInWorld());
 
-			CombateManager.instance.GetPathfinding().DebugDrawSelectables();
+
+			//CombateManager.instance.GetPathfinding().DebugDrawSelectables();
+			CombateManager.instance.GetPathfinding().FindSelectableNodes();
 			CombateManager.instance.GetPathRenderer().CreateSelectableNodesMesh();
 			CombateManager.instance.SetCurrentUnity(unidad);
 		}

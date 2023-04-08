@@ -99,9 +99,18 @@ public class Pathfinding
 		return selectableNodes;
 	}
 
+	public List<MeshFilter> GetExteriorSelectableNodesMeshesList()
+	{
+		List<MeshFilter> meshFilterList = new List<MeshFilter>();
+		foreach (PathNode pathNode in exteriorSelectableNodes)
+		{
+			meshFilterList.Add(GetPathNodeMesh(pathNode));
+		}
+		return meshFilterList;
+	}
+
 	public List<MeshFilter> GetSelectableNodesMeshesList()
 	{
-		Debug.Log("Actualmente tenemos "+selectableNodes.Count+" casillas seleccionables");
 		List<MeshFilter> meshFilterList = new List<MeshFilter>();
 		foreach (PathNode pathNode in selectableNodes)
 		{
@@ -414,6 +423,7 @@ public class Pathfinding
 		{
 			UpdateExteriores(node);
 		}
+		Debug.Log("devolviendo "+selectableNodes.Count+" selectable EXTERIOR nodes");
 		return exteriorSelectableNodes;
 	}
 
@@ -431,7 +441,8 @@ public class Pathfinding
 		Vector3 pathNodePosition = new Vector3(pathNode.x, 0, pathNode.z);
 		Vector3 neighbourNodePosition = pathNodePosition + Directions.GetVectorFromCardinal(cardinal);
 		PathNode neighbour = GetNode(Mathf.FloorToInt(neighbourNodePosition.x), Mathf.FloorToInt( neighbourNodePosition.z));
-		if (neighbour == null || !neighbour.selectable)
+		
+		if (neighbour == null || !neighbour.selectable || !pathNode.neighbours.Contains(neighbour))
 		{
 			//Debug.Log("tengo exterior al " + cardinal);
 			pathNode.exterior.Add(cardinal);

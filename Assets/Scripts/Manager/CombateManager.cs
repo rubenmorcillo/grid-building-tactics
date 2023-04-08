@@ -66,8 +66,10 @@ public class CombateManager : MonoBehaviour
 
         //pathfinding.FindSelectableNodes();
         //pathfinding.DebugDrawSelectables();
+
+        //pathfinding.FindSelectableNodes();
         //pathRenderer.CreateSelectableNodesMesh();
-        turnManager?.Update();
+		turnManager?.Update();
 
         ControlarClick();
 

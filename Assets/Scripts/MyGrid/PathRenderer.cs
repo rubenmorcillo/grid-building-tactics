@@ -100,16 +100,19 @@ public class PathRenderer : MonoBehaviour
     public void CreateSelectableNodesMesh()
 	{
 		List<PathNode> exteriorNodes = CombateManager.instance.GetPathfinding().GetExteriorSelectableNodes();
-
-        CreateCubes(GetExteriorPoints(exteriorNodes).Distinct().ToList());
-        DrawPath(EdgesToPointList( SortEdges(GetExteriorEdges(exteriorNodes).Distinct().ToList())).ToArray());
-
-        Debug.Log("creando el mesh");
-		List<MeshFilter> meshesList = CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
-		if (meshesList != null && meshesList.Count > 0)
+        if (exteriorNodes.Count > 0)
 		{
-			CombineMeshList(meshesList);
-		}
+            //CreateCubes(GetExteriorPoints(exteriorNodes).Distinct().ToList());
+            DrawPath(EdgesToPointList(SortEdges(GetExteriorEdges(exteriorNodes).Distinct().ToList())).ToArray());
+			Debug.Log("creando el mesh");
+			//List<MeshFilter> meshesList = CombateManager.instance.GetPathfinding().GetExteriorSelectableNodesMeshesList();
+			List<MeshFilter> meshesList = CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
+            if (meshesList != null && meshesList.Count > 0)
+            {
+                CombineMeshList(meshesList);
+            }
+        }
+       
 	}
 
     List<Vector3> EdgesToPointList(List<(Vector3, Vector3)> edges)
@@ -139,12 +142,17 @@ public class PathRenderer : MonoBehaviour
         {
            
             bool encontrado = false;
-
+            if (ordenados[ordenados.Count - 1].Item1 == new Vector3(0.00f, 0.00f, 0.00f))
+			{
+                Debug.Log("Soy el segmento " + ordenados[ordenados.Count - 1] + " y Voy a buscar la continuación ");
+                segmentos.ForEach(s => Debug.Log("SEGMENTO ORIGINAL: " + s.Item1 + " -> " + s.Item2));
+            }
             for (int i = 0; i < segmentos.Count; i++)
             {
                 //if (segmentos[i].Item1 == ordenados[ordenados.Count - 1].Item2 || segmentos[i].Item1 == ordenados[ordenados.Count - 1].Item1 || segmentos[i].Item2 == ordenados[ordenados.Count - 1].Item2 || segmentos[i].Item2 == ordenados[ordenados.Count - 1].Item1)
                 if (segmentos[i].Item1 == ordenados[ordenados.Count - 1].Item2 || segmentos[i].Item2 == ordenados[ordenados.Count - 1].Item1)
                 {
+                    Debug.Log("he encontrado el segmento siguiente: "+segmentos[i]);
                     ordenados.Add(segmentos[i]);
                     segmentos.RemoveAt(i);
                     encontrado = true;
@@ -152,6 +160,7 @@ public class PathRenderer : MonoBehaviour
                 }
                 else if (segmentos[i].Item2 == ordenados[ordenados.Count - 1].Item2 || segmentos[i].Item2 == ordenados[ordenados.Count - 1].Item1)
                 {
+                    Debug.Log("he encontrado el segmento siguiente: " + segmentos[i]);
                     ordenados.Add((segmentos[i].Item2, segmentos[i].Item1));
                     segmentos.RemoveAt(i);
                     encontrado = true;
