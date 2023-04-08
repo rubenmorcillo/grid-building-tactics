@@ -1,31 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Experimental.Rendering.Universal;
-using Unity.Collections;
 using System.Linq;
 using System;
 
 public class PathRenderer : MonoBehaviour
 {
-    public Color lineColor;
-
     private LineRenderer lineRenderer;
+    
 
     //private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
     private GameObject combinedMeshObject;
     public Shader selectableMeshShader;
-    public Material selectableMeshMaterial;
+	private void Awake()
+	{
+        lineRenderer = gameObject.AddComponent<LineRenderer>();
 
-
-
-
+    }
     private void Start()
     {
         // Agrega un Line Renderer al objeto
-        lineRenderer = gameObject.AddComponent<LineRenderer>();
 
         // Configura el Line Renderer para usar una textura simple y un material sin textura
         //lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
@@ -36,8 +30,8 @@ public class PathRenderer : MonoBehaviour
         lineRenderer.numCapVertices = 5;
 
         // Establece el color de la línea
-        lineRenderer.startColor = lineColor;
-        lineRenderer.endColor = lineColor;
+        lineRenderer.startColor = CombateManager.instance.lineRendererColor;
+        lineRenderer.endColor = CombateManager.instance.lineRendererColor;
     }
 
 
@@ -55,20 +49,6 @@ public class PathRenderer : MonoBehaviour
         
     }
 
-    public void DrawShape(Vector3[] points)
-    {
-		points = SimplifiedPointsTo3D(SortPointsByAngle(GetSimplifiedPoints(points), new Vector2(0, 0)));
-
-		lineRenderer.positionCount = points.Length;
-
-		for (int i = 0; i < points.Length; i++)
-		{
-			lineRenderer.SetPosition(i, points[i]);
-		}
-
-		lineRenderer.loop = true; // Closes the shape
-	}
-
     public void CombineMeshList(List<MeshFilter> meshFiltersList)
 	{
         CombineInstance[] combineInstances = new CombineInstance[meshFiltersList.Count];
@@ -85,10 +65,6 @@ public class PathRenderer : MonoBehaviour
                 combineInstance.transform = meshFiltersList[i].transform.localToWorldMatrix;
 
             }
-
-            // Transformamos los vértices del mesh según la transformación del objeto
-
-            // Añadimos el CombineInstance al array
             combineInstances[i] = combineInstance;
         }
 
@@ -107,100 +83,265 @@ public class PathRenderer : MonoBehaviour
         Mesh combinedMesh = new Mesh();
         combinedMesh.CombineMeshes(combineInstances, true, true);
 
-        // Asignamos el mesh combinado al MeshFilter
-        meshFilter.mesh = combinedMesh;
+		// Asignamos el mesh combinado al MeshFilter
+		meshFilter.mesh = combinedMesh;
 
         // Añadimos un componente MeshRenderer al objeto
         meshRenderer = combinedMeshObject.AddComponent<MeshRenderer>();
-        meshRenderer.material = new Material(Shader.Find("Standard"));
+
+        //Load a Texture (Assets/Resources/Textures/texture01.png)
+        Material material  = Resources.Load<Material>("Materials/OutlineMaterial");
+        meshRenderer.material = material;
+
     }
 
-	public void CreateSelectableNodesMesh()
+
+    public void CreateSelectableNodesMesh()
 	{
-        Debug.Log("creando el mesh");
-		//CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
-		List<MeshFilter> meshesList = CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
-        if (meshesList != null && meshesList.Count > 0)
+		List<PathNode> exteriorNodes = CombateManager.instance.GetPathfinding().GetExteriorSelectableNodes();
+        if (exteriorNodes.Count > 0)
 		{
-            CombineMeshList(meshesList);
+            //CreateCubes(GetExteriorPoints(exteriorNodes).Distinct().ToList());
+            //CREAR LOS BORDES CON LA LINEA -> NO ESTÁ FUNCIONANDO CORRECTAMENTE POR LOS SEGMENTOS
+           // DrawPath(EdgesToPointList(SortEdges(GetExteriorEdges(exteriorNodes).Distinct().ToList())).ToArray());
+			Debug.Log("creando el mesh");
+			//List<MeshFilter> meshesList = CombateManager.instance.GetPathfinding().GetExteriorSelectableNodesMeshesList();
+			List<MeshFilter> meshesList = CombateManager.instance.GetPathfinding().GetSelectableNodesMeshesList();
+			if (meshesList != null && meshesList.Count > 0)
+            {
+                CombineMeshList(meshesList);
+            }
         }
-
-        //      Debug.Log("tengo " + verts.Length + " puntos");
-        //      //Debug.Log()
-        //      //      int i = 0;
-        //      //      foreach(Vector3 vert in verts)
-        //      //{
-        //      //          i++;
-        //      //          Debug.Log("NORMAL " + i + " ->" + vert);
-        //      //      }
-        //      //verts = SimplifiedPointsTo3D(SortPointsByAngle(GetSimplifiedPoints(verts), new Vector2(CalculateCenter(verts).x, CalculateCenter(verts).z)));
-        //      //i = 0;
-        //      //foreach (Vector3 vert in verts)
-        //      //{
-        //      //    i++;
-        //      //    Debug.Log("ORDENADO "+i+" ->" + vert);
-
-        //      //}
-        //      List<Vector3> lista = new List<Vector3>(verts);
-        ////CreateMesh(lista.OrderBy(p => p.x).ThenBy(p => p.z).ToList().ToArray());
-        //List<Vector2> convexHull = GrahamScan.ConvexHull(new List<Vector3>(verts));
-        ////convexHull.ForEach(c => Debug.Log("CONVEX HULL: "+c));
-        //CreateMesh(SimplifiedPointsTo3D(convexHull));
-
-        ////Debug.Log("mientras que con el convexHull tendría " + convexHull.Count);
-
-        ////i = 0;
-        ////foreach (Vector2 vert in convexHull)
-        ////{
-        ////	i++;
-        ////	Debug.Log("GRAHAM " + i + " ->" + vert);
-
-        ////}
-        ////      for (int z = 0; z < SimplifiedPointsTo3D(convexHull).Length; z++)
-        ////      {
-        ////          Debug.Log("GRAHAM3D " + z + " ->" + SimplifiedPointsTo3D(convexHull)[z]);
-        ////      }
-
-    }
-
-    void CreateMesh(Vector3[] convexHull)
-    {
-        // Creamos un nuevo Mesh
-        Mesh mesh = new Mesh();
-
-        // Añadimos los vertices
-        mesh.vertices = convexHull;
-
-        // Definimos los triangulos a partir de los vertices
-        int[] triangles = new int[(convexHull.Length - 2) * 3];
-        int count = 0;
-        for (int i = 2; i < convexHull.Length; i++)
-        {
-            triangles[count++] = 0;
-            triangles[count++] = i - 1;
-            triangles[count++] = i;
-        }
-
-        // Asignamos los triangulos al Mesh
-        mesh.triangles = triangles;
-
-        // Recalculamos las normales y tangentes
-        mesh.RecalculateNormals();
-        mesh.RecalculateTangents();
-
-        // Asignamos el Mesh al componente MeshFilter
-        MeshFilter meshFilter = GetComponent<MeshFilter>();
-        meshFilter.mesh = mesh;
-
-        // Configuramos el material del MeshRenderer
-        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
        
-        meshRenderer.material = new Material(selectableMeshShader);
-        //meshRenderer.material = new Material(selectableMeshMaterial);
+	}
+
+    List<Vector3> EdgesToPointList(List<(Vector3, Vector3)> edges)
+	{
+        List<Vector3> sortedPoints = new List<Vector3>();
+        sortedPoints.Add(edges.First().Item1);
+        sortedPoints.Add(edges.First().Item2);
+        foreach((Vector3, Vector3) edge in edges)
+		{
+            sortedPoints.Add(edge.Item2);
+		}
+
+        return sortedPoints;
+	}
+	
+
+    public static List<(Vector3, Vector3)> SortEdges(List<(Vector3, Vector3)> segmentos)
+    {
+        List<(Vector3, Vector3)> ordenados = new List<(Vector3, Vector3)>();
+       
+        if (segmentos.Count == 0) return ordenados;
+
+        ordenados.Add(segmentos[0]);
+        segmentos.RemoveAt(0);
+
+        while (segmentos.Count > 0)
+        {
+           
+            bool encontrado = false;
+            if (ordenados[ordenados.Count - 1].Item1 == new Vector3(0.00f, 0.00f, 0.00f))
+			{
+                Debug.Log("Soy el segmento " + ordenados[ordenados.Count - 1] + " y Voy a buscar la continuación ");
+                segmentos.ForEach(s => Debug.Log("SEGMENTO ORIGINAL: " + s.Item1 + " -> " + s.Item2));
+            }
+            for (int i = 0; i < segmentos.Count; i++)
+            {
+                //if (segmentos[i].Item1 == ordenados[ordenados.Count - 1].Item2 || segmentos[i].Item1 == ordenados[ordenados.Count - 1].Item1 || segmentos[i].Item2 == ordenados[ordenados.Count - 1].Item2 || segmentos[i].Item2 == ordenados[ordenados.Count - 1].Item1)
+                if (segmentos[i].Item1 == ordenados[ordenados.Count - 1].Item2 || segmentos[i].Item2 == ordenados[ordenados.Count - 1].Item1)
+                {
+                    Debug.Log("he encontrado el segmento siguiente: "+segmentos[i]);
+                    ordenados.Add(segmentos[i]);
+                    segmentos.RemoveAt(i);
+                    encontrado = true;
+                    break;
+                }
+                else if (segmentos[i].Item2 == ordenados[ordenados.Count - 1].Item2 || segmentos[i].Item2 == ordenados[ordenados.Count - 1].Item1)
+                {
+                    Debug.Log("he encontrado el segmento siguiente: " + segmentos[i]);
+                    ordenados.Add((segmentos[i].Item2, segmentos[i].Item1));
+                    segmentos.RemoveAt(i);
+                    encontrado = true;
+                    break;
+                }
+            }
+            if (!encontrado) break;
+        }
+
+        
+        return ordenados;
     }
 
 
+    List<(Vector3, Vector3)> GetExteriorEdges(List<PathNode> pathNodeList)
+    {
+        float cellSize = CombateManager.instance.GetPathfinding().GetGrid().GetCellSize();
+        List<(Vector3 puntoA, Vector3 puntoB)> exteriorEdges = new List<(Vector3 puntoA, Vector3 puntoB)>();
+        foreach (PathNode pathNode in pathNodeList)
+        {
+            foreach (Directions.Cardinal ladoExterno in pathNode.exterior)
+            {
+                Vector3 pointA;
+                Vector3 pointB;
+                switch (ladoExterno)
+                {
+                    case Directions.Cardinal.ESTE:
+                        pointA = new Vector3(pathNode.worldX + 1 * cellSize, 0, pathNode.worldZ);
+                        pointB = new Vector3(pathNode.worldX + 1 * cellSize, 0, pathNode.worldZ + 1 * cellSize);
+                        exteriorEdges.Add((pointA, pointB));
+                        break;
+                    case Directions.Cardinal.OESTE:
+                        pointA = new Vector3(pathNode.worldX, 0, pathNode.worldZ);
+                        pointB = new Vector3(pathNode.worldX, 0, pathNode.worldZ + 1 * cellSize);
+                        exteriorEdges.Add((pointA, pointB));
 
+                        //exteriorPoints.Add(pointA);
+                        //exteriorPoints.Add(pointB);
+                        break;
+                    case Directions.Cardinal.NORTE:
+                        pointA = new Vector3(pathNode.worldX, 0, pathNode.worldZ + 1 * cellSize);
+                        pointB = new Vector3(pathNode.worldX + 1 * cellSize, 0, pathNode.worldZ + 1 * cellSize);
+                        exteriorEdges.Add((pointA, pointB));
+
+                        //exteriorPoints.Add(pointA);
+                        //exteriorPoints.Add(pointB);
+                        break;
+                    case Directions.Cardinal.SUR:
+                        pointA = new Vector3(pathNode.worldX, 0, pathNode.worldZ);
+                        pointB = new Vector3(pathNode.worldX + 1 * cellSize, 0, pathNode.worldZ);
+                        exteriorEdges.Add((pointA, pointB));
+
+                        //exteriorPoints.Add(pointA);
+                        //exteriorPoints.Add(pointB);
+                        break;
+                }
+            }
+
+        }
+        return exteriorEdges;
+    }
+
+
+    List<Vector3> GetExteriorPoints(List<PathNode> pathNodeList)
+	{
+        float cellSize = CombateManager.instance.GetPathfinding().GetGrid().GetCellSize();
+        List<Vector3> exteriorPoints = new List<Vector3>();
+        foreach(PathNode pathNode in pathNodeList)
+		{
+            foreach (Directions.Cardinal ladoExterno in pathNode.exterior)
+            {
+                Vector3 pointA; 
+                Vector3 pointB;
+                switch (ladoExterno)
+                {
+                    case Directions.Cardinal.ESTE:
+                        pointA = new Vector3(pathNode.worldX + 1 * cellSize, 0, pathNode.worldZ);
+                        pointB = new Vector3(pathNode.worldX + 1 * cellSize, 0, pathNode.worldZ + 1 * cellSize);
+                        exteriorPoints.Add(pointA);
+                        exteriorPoints.Add(pointB);
+                        break;
+                    case Directions.Cardinal.OESTE:
+                        pointA = new Vector3(pathNode.worldX, 0, pathNode.worldZ);
+                        pointB = new Vector3(pathNode.worldX, 0, pathNode.worldZ + 1 * cellSize);
+                        exteriorPoints.Add(pointA);
+                        exteriorPoints.Add(pointB);
+                        break;
+                    case Directions.Cardinal.NORTE:
+                        pointA = new Vector3(pathNode.worldX, 0, pathNode.worldZ + 1 * cellSize);
+                        pointB = new Vector3(pathNode.worldX + 1 * cellSize, 0, pathNode.worldZ + 1 * cellSize);
+                        exteriorPoints.Add(pointA);
+                        exteriorPoints.Add(pointB);
+                        break;
+                    case Directions.Cardinal.SUR:
+                        pointA = new Vector3(pathNode.worldX, 0, pathNode.worldZ);
+                        pointB = new Vector3(pathNode.worldX + 1 * cellSize, 0, pathNode.worldZ);
+                        exteriorPoints.Add(pointA);
+                        exteriorPoints.Add(pointB);
+                        break;
+                }
+            }
+            
+        }
+        return exteriorPoints;
+    }
+
+	//FUNCIÓN PARA DEBUG
+	void CreateCubes(List<Vector3> positions)
+	{
+		foreach (Vector3 pos in positions)
+		{
+			GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			cube.transform.position = pos;
+		}
+	}
+
+
+    List<Vector3> Ordenar(List<Vector3> originalPoints)
+	{
+        float cellSize = CombateManager.instance.GetPathfinding().GetGrid().GetCellSize();
+        Queue<Vector3> originalPointsQueue = new Queue<Vector3>(originalPoints);
+
+        List<Vector3> orderedPoints = new List<Vector3>();
+        Vector3 lastPointAdded = originalPointsQueue.Peek();
+        //orderedPoints.Add(lastPointAdded);
+
+  //      while (orderedPoints.Count != originalPoints.Count)
+		//{
+  //          for (int i = 0; i < originalPointsQueue.Count; i++)
+  //          {
+
+  //              Vector3 puntoB = originalPoints[i];
+  //              Debug.Log(" vamos a comparar el punto " + lastPointAdded + " y el punto " + puntoB);
+  //              float diferenciaX = Math.Abs(lastPointAdded.x - puntoB.x);
+  //              float diferenciaZ = Math.Abs(lastPointAdded.z - puntoB.z);
+  //              float sumaDiferencia = diferenciaX + diferenciaZ;
+  //              Debug.Log("la diferencia total es de " + sumaDiferencia);
+  //              if (sumaDiferencia == cellSize)
+  //              {
+  //                  Debug.Log("ESte me cuadra con la sumaDiferencia");
+  //                  if (!orderedPoints.Contains(puntoB))
+  //                  {
+  //                      lastPointAdded = puntoB;
+  //                      orderedPoints.Add(lastPointAdded);
+  //                      Debug.Log("debería añadir el punto " + lastPointAdded);
+  //                  }
+  //              }
+  //          }
+  //      }
+
+
+
+       
+        orderedPoints.Add(originalPoints[0]);
+
+        int i = 1;
+        int iterations = 0;
+        while (orderedPoints.Count < originalPoints.Count && iterations < originalPoints.Count*2)
+        {
+            if (i >= originalPoints.Count)
+            {
+                i = 1;
+                iterations++;
+            }
+            float difX = Mathf.Abs(orderedPoints[orderedPoints.Count - 1].x - originalPoints[i].x);
+            float difZ = Mathf.Abs(orderedPoints[orderedPoints.Count - 1].z - originalPoints[i].z);
+            float difTotal = difX + difZ;
+            if (!orderedPoints.Contains(originalPoints[i]) && difTotal == cellSize)
+            {
+                orderedPoints.Add(originalPoints[i]);
+                i = 0;
+            }
+            i++;
+        }
+
+        orderedPoints.ForEach(o => Debug.Log("Soy el punto ordenado " + o));
+        return orderedPoints;
+
+    }
+	
+    
     // Ordena los puntos por ángulo respecto al punto pivot
     private static List<Vector2> SortPointsByAngle(List<Vector2> points, Vector2 pivot)
     {
@@ -247,62 +388,4 @@ public class PathRenderer : MonoBehaviour
         return points3D.ToArray();
 	}
 
-    public List<Vector3> UnifySegments(List<Vector3> vertices, HashSet<Tuple<Vector3, Vector3>> unitedSegments)
-    {
-        if (vertices.Count == 1) return vertices;
-
-        var newVertices = new List<Vector3>();
-        for (int i = 0; i < vertices.Count; i++)
-        {
-            var v1 = vertices[i];
-            for (int j = i + 1; j < vertices.Count; j++)
-            {
-                var v2 = vertices[j];
-                var segment = new Tuple<Vector3, Vector3>(v1, v2);
-                if (!unitedSegments.Contains(segment))
-                {
-                    var canUnify = true;
-                    foreach (var otherSegment in unitedSegments)
-                    {
-                        if (AreSegmentsAdjacent(segment, otherSegment))
-                        {
-                            var commonVertex = GetCommonVertex(segment, otherSegment);
-                            if (commonVertex != null && !vertices.Contains(commonVertex.Value))
-                            {
-                                canUnify = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (canUnify)
-                    {
-                        unitedSegments.Add(segment);
-                        newVertices.Add(v1);
-                        newVertices.Add(v2);
-                    }
-                }
-            }
-        }
-
-        if (newVertices.Count > 0)
-        {
-            newVertices = UnifySegments(newVertices, unitedSegments);
-        }
-
-        return newVertices;
-    }
-
-    public bool AreSegmentsAdjacent(Tuple<Vector3, Vector3> segment1, Tuple<Vector3, Vector3> segment2)
-    {
-        return segment1.Item1 == segment2.Item1 || segment1.Item1 == segment2.Item2 ||
-               segment1.Item2 == segment2.Item1 || segment1.Item2 == segment2.Item2;
-    }
-
-    public Vector3? GetCommonVertex(Tuple<Vector3, Vector3> segment1, Tuple<Vector3, Vector3> segment2)
-    {
-        if (segment1.Item1 == segment2.Item1 || segment1.Item1 == segment2.Item2) return segment1.Item1;
-        if (segment1.Item2 == segment2.Item1 || segment1.Item2 == segment2.Item2) return segment1.Item2;
-        return null;
-    }
 }

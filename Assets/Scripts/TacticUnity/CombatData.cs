@@ -18,7 +18,7 @@ public class CombatData
 
 	public CombatData()
 	{
-		if (movementRange <= 0) movementRange = 8;
+		if (movementRange <= 0) movementRange = 5;
 		if (jumpHeight <= 0) jumpHeight = 1;
 		if (initiative <= 0) initiative = 3;
 
